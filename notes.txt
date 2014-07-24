@@ -1,0 +1,16 @@
+BG1 is for the floor
+BG2 is for ledges, things that go over the floor
+EF  is for the seeded tiles
+ENT and MC should be replaced with object layers for entities and the  Mc respectively
+OVR1 is for ledges, BG1 element
+OVR2 is for ledges, EF elements
+OVR3 things on ledges, 1
+OVR4 is for things on ledges, 2
+OVR5 is for things on ledges, 3
+
+...I think the MC will have to have a z value to figure out where to render it
+
+
+
+-2-2-2 is for no element / cannot apply element
+222 is for magic/life

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+    <header>
+        <link rel="shortcut icon" href="images/icon.png">
+        <title>Flowers for the Past</title>
+    </header> 
+    
+    <body>
+        <canvas id="canvas" oncontextmenu="return false;">
+            HTML5 is not supported on this browser.
+        </canvas>
+    </body>
+    
+    <footer>
+        <script type="text/javascript" src="js/require.js"></script>
+        <script type="text/javascript" src="js/main.js"></script>
+        <script> 
+        requirejs.config({
+            baseUrl: 'js/',
+        });
+        </script>
+        <script type="text/javascript" src="js/loadImages.js"></script>
+    </footer>
+</html>
+
+
+
+<style>
+    html, body{ 
+        margin: auto;
+        padding: 0;
+        background-color: #000222;
+    } 
+    #canvas{ 
+        display: block;        
+        cursor: none;
+        margin: auto;
+        vertical-align: bottom;
+    }
+</style>
+

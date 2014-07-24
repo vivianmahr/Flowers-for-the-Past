@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" width="200" height="1" tilewidth="24" tileheight="24">
+ <tileset firstgid="1" name="processing" tilewidth="24" tileheight="24">
+  <image source="../../tiles/processing.png" width="48" height="48"/>
+ </tileset>
+ <tileset firstgid="5" name="0 0 0" tilewidth="24" tileheight="24">
+  <image source="../../tiles/0 0 0.png" width="288" height="288"/>
+ </tileset>
+ <tileset firstgid="149" name="0 0 1" tilewidth="24" tileheight="24">
+  <image source="../../tiles/0 0 1.png" width="264" height="288"/>
+ </tileset>
+ <tileset firstgid="281" name="0 0 -1" tilewidth="24" tileheight="24">
+  <image source="../../tiles/0 0 -1.png" width="264" height="288"/>
+ </tileset>
+ <tileset firstgid="413" name="0 1 0" tilewidth="24" tileheight="24">
+  <image source="../../tiles/0 1 0.png" width="264" height="288"/>
+ </tileset>
+ <tileset firstgid="545" name="0 -1 0" tilewidth="24" tileheight="24">
+  <image source="../../tiles/0 -1 0.png" width="264" height="288"/>
+ </tileset>
+ <tileset firstgid="677" name="1 0 0" tilewidth="24" tileheight="24">
+  <image source="../../tiles/1 0 0.png" width="264" height="288"/>
+ </tileset>
+ <tileset firstgid="809" name="-1 0 0" tilewidth="24" tileheight="24">
+  <image source="../../tiles/-1 0 0.png" width="264" height="288"/>
+ </tileset>
+ <layer name="Tile Layer 1" width="200" height="1">
+  <data encoding="csv">
+7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8,7,8
+</data>
+ </layer>
+</map>
