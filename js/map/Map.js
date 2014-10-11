@@ -14,6 +14,7 @@ function(goody, Point, vars, Rect, Tile)
         this.heightMap = [];
         this.imageMap = [];
         this.objects = [];
+        
         // Okay. 3 maps, one for each of the variables
         // height map
         // 3 layer image map
