@@ -9,8 +9,8 @@ function(Entity, images, Point, goody, vars)
         this.accel = .5;
         this.friction = .7;
         this._velCap = 3;
-        this.rect.width = Math.floor(this.image.width/1.5);
-        this.rect.height = Math.floor(this.image.height/2);
+        this.rect.width = 21;
+        this.rect.height = 27;
     }
     
     MainChar.prototype = new Entity.Entity();
@@ -69,45 +69,46 @@ function(Entity, images, Point, goody, vars)
     MainChar.prototype.move = function(map)
     {
         // I imagine apply tileEffect would be around here
+        
         var dx = this.velocity.x;
         var dy = this.velocity.y;
         var walls = map.walls;
-        var wallLength = walls.length;
-        var td = vars.tileDimension;
+        // var wallLength = walls.length;
+        // var td = vars.tileDimension;
         
         this.rect.position.x += dx;
         
-        for (var i = 0; i < wallLength; i++)
-        {
-            if (this.rect.collideRect(walls[i]))
-            {
-                if (dx > 0) // moving right, hit left side of wall
-                {
-                    this.rect.setRight(walls[i].getLeft()-1);
-                }
-                else if (dx < 0) // moving left, hit right side of wall
-                {
-                    this.rect.setLeft(walls[i].getRight()+1);
-                }
-            }
-        }
+        // for (var i = 0; i < wallLength; i++)
+        // {
+        //     if (this.rect.collideRect(walls[i]))
+        //     {
+        //         if (dx > 0) // moving right, hit left side of wall
+        //         {
+        //             this.rect.setRight(walls[i].getLeft()-1);
+        //         }
+        //         else if (dx < 0) // moving left, hit right side of wall
+        //         {
+        //             this.rect.setLeft(walls[i].getRight()+1);
+        //         }
+        //     }
+        // }
         
         this.rect.position.y += dy;
 
-        for (var i = 0; i < wallLength; i++)
-        {
-            if (this.rect.collideRect(walls[i]))
-            {
-                if (dy > 0) // moving down, hit top side of wall
-                {
-                    this.rect.setBottom(walls[i].getTop()-1);
-                }
-                else if (dy < 0) // moving up, hit bottom side of wall
-                {
-                    this.rect.setTop(walls[i].getBottom()+1);
-                }
-            }
-        }
+        // for (var i = 0; i < wallLength; i++)
+        // {
+        //     if (this.rect.collideRect(walls[i]))
+        //     {
+        //         if (dy > 0) // moving down, hit top side of wall
+        //         {
+        //             this.rect.setBottom(walls[i].getTop()-1);
+        //         }
+        //         else if (dy < 0) // moving up, hit bottom side of wall
+        //         {
+        //             this.rect.setTop(walls[i].getBottom()+1);
+        //         }
+        //     }
+        // }
     }
     
     return {

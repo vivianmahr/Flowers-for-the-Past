@@ -6,12 +6,12 @@ function(Point, goody, images, vars)
         this.offset = new Point.Point(0, 0); 
         this.mapBase = images._000;
         this.buffer = [];
-    };
+    }
     
     Camera.prototype.loadMap = function(map)
     {
         this.buffer = [];
-        var bufferLength = map.layers.length;
+        var bufferLength = map.displayLayers;
         var w = map.pixelWidth;
         var h = map.pixelHeight;
         var ml = map.length;
@@ -36,7 +36,7 @@ function(Point, goody, images, vars)
         for (var i=0; i < bufferLength; i++)
         {
             ctx.drawImage(this.buffer[i], this.offset.x, this.offset.y);
-            if ((i+.5) == MC.z)
+            if ((i+0.5) == MC.z)
             {
                 MC.drawImage(ctx, this.offset);
                 MC.rect.draw(ctx, this.offset, "#FF00FF");
@@ -52,13 +52,13 @@ function(Point, goody, images, vars)
             cursor.position.y,                                        
             8,                                                         
             8                                                                       
-        )
+        );
         //for (var n = 0; n < map.walls.length; n++){ map.walls[n].draw(ctx, this.offset);}
     };
     
     Camera.prototype.renderTile = function(image, i, tile, map, ctx)
     {    
-        if (tile == 0 || tile==1) { return; }
+        if ( tile === 0 || tile==1 ) { return; }
         var dim = vars.tileDimension;
         var mapPoint = map.pixelPoint(i);
         var tilePos = tile-1-vars.propertiesOffset; // tile position in the tilesheet
@@ -79,7 +79,7 @@ function(Point, goody, images, vars)
             mapPoint.y,                                                 //yPosCanvas    
             dim,                                                        //imageWidth on Canvas
             dim                                                         //imageHeight on Canvas                
-        )
+        );
     };
     
     Camera.prototype._calcOffset = function(canvas, MC, map)
@@ -93,5 +93,5 @@ function(Point, goody, images, vars)
     
     return {
         Camera:Camera
-    }    
+    };
 });

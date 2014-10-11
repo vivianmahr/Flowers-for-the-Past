@@ -1,6 +1,0 @@
-./p_0.tmx
-./p_1.tmx
-./p_2.tmx
-./p_3.tmx
-./p_4.tmx
-./p_5.tmx
