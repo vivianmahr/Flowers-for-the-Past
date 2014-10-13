@@ -6,26 +6,8 @@
  <tileset firstgid="10" name="processing" tilewidth="24" tileheight="24">
   <image source="../../images/processing.png" width="48" height="48"/>
  </tileset>
- <tileset firstgid="14" name="0 0 0" tilewidth="24" tileheight="24">
-  <image source="../../images/0 0 0.png" width="288" height="288"/>
- </tileset>
- <tileset firstgid="158" name="0 0 1" tilewidth="24" tileheight="24">
-  <image source="../../images/0 0 1.png" width="264" height="288"/>
- </tileset>
- <tileset firstgid="290" name="0 0 -1" tilewidth="24" tileheight="24">
-  <image source="../../images/0 0 -1.png" width="264" height="288"/>
- </tileset>
- <tileset firstgid="422" name="0 1 0" tilewidth="24" tileheight="24">
-  <image source="../../images/0 1 0.png" width="264" height="288"/>
- </tileset>
- <tileset firstgid="554" name="0 -1 0" tilewidth="24" tileheight="24">
-  <image source="../../images/0 -1 0.png" width="264" height="288"/>
- </tileset>
- <tileset firstgid="686" name="1 0 0" tilewidth="24" tileheight="24">
-  <image source="../../images/1 0 0.png" width="264" height="288"/>
- </tileset>
- <tileset firstgid="818" name="-1 0 0" tilewidth="24" tileheight="24">
-  <image source="../../images/-1 0 0.png" width="264" height="288"/>
+ <tileset firstgid="14" name="BaseTiles" tilewidth="24" tileheight="24">
+  <image source="../../images/BaseTiles.png" width="192" height="192"/>
  </tileset>
  <layer name="BG1" width="1" height="1">
   <data encoding="csv">

@@ -11,7 +11,7 @@ function(Point, goody, images, vars)
     Camera.prototype.loadMap = function(map)
     {
         this.buffer = [];
-        var bufferLength = map.displayLayers;
+        var bufferLength = map.displayedLayers;
         var w = map.pixelWidth;
         var h = map.pixelHeight;
         var ml = map.length;
@@ -21,10 +21,10 @@ function(Point, goody, images, vars)
             this.buffer[i].width = w;
             this.buffer[i].height = h;
             var ctx = this.buffer[i].getContext("2d");
-            var layer = map.layers[i];
+            var layer = map.imageMap[i];
             for (var n = 0; n < ml; n++)
             {
-                this.renderTile(images._000, n, layer[n], map, ctx);
+                this.renderTile(images.BaseTiles, n, layer[n], map, ctx);
             }
         }
     };
@@ -36,7 +36,7 @@ function(Point, goody, images, vars)
         for (var i=0; i < bufferLength; i++)
         {
             ctx.drawImage(this.buffer[i], this.offset.x, this.offset.y);
-            if ((i+0.5) == MC.z)
+            if ((i+0.5) == MC.movementAttributes.height)
             {
                 MC.drawImage(ctx, this.offset);
                 MC.rect.draw(ctx, this.offset, "#FF00FF");
@@ -58,12 +58,12 @@ function(Point, goody, images, vars)
     
     Camera.prototype.renderTile = function(image, i, tile, map, ctx)
     {    
-        if ( tile === 0 || tile==1 ) { return; }
+        if ( tile === 0 ) { return; } // tiled dimensions
         var dim = vars.tileDimension;
-        var mapPoint = map.pixelPoint(i);
-        var tilePos = tile-1-vars.propertiesOffset; // tile position in the tilesheet
-        var xpos = (tilePos%12) * dim;              //calc off tilePos
-        var ypos = Math.floor(tilePos/12) * dim;    //calc off tilePos
+        var mapPoint = map.tileToPixel(i);
+        var tilePos = tile-1-vars.propertiesOffset;                     // tile position in the tilesheet
+        var xpos = (tilePos % (image.width/24) -1) * dim;               //calc off tilePos
+        var ypos = Math.floor(tilePos/(image.width/24) -1) * dim;       //calc off tilePos
         if (image == images._debug)
         {
             xpos = 24;

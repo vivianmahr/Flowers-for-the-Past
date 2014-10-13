@@ -26,11 +26,27 @@ function(goody)
         }
         return true;
     }
+
+    function stringContains(string1, string2) {
+        return string1.indexOf(string2) != -1;
+    }
+
+    function inArray(arr, searchFor) {
+        for (var i=0; i<arr.length; i++){
+            if (arr[i] == searchFor)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
     
     return {
         optional:optional,
         cap:cap, 
         randint:randint,
-        allSame: allSame
+        allSame: allSame,
+        stringContains: stringContains,
+        inArray: inArray
     };
 });

@@ -1,6 +1,7 @@
 images = {
     MC: new Image(),
     cursor: new Image(),
+    BaseTiles: new Image(),
     _000: new Image(),
     _100: new Image(),
     _n100: new Image(),
@@ -11,7 +12,8 @@ images = {
     _debug: new Image()
 }
 
-images.MC.src = "images/MCFront.png",
+images.MC.src = "images/MCFront.png";
+images.BaseTiles.src = "images/BaseTiles.png";
 images.cursor.src = "images/cursor.png";
 images._000.src = "images/0 0 0.png";
 images._100.src = "images/1 0 0.png";

@@ -12,5 +12,6 @@ function()
         _001: images._001,
         _00n1: images._00n1,
         _debug: images._debug,
+        BaseTiles: images.BaseTiles
     }
 });

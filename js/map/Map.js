@@ -1,5 +1,5 @@
-define(["util/goody", "util/Point", "assets/vars", "util/Rect", "map/Tile"],
-function(goody, Point, vars, Rect, Tile)
+define(["util/goody", "util/Point", "assets/vars", "util/Rect"],
+function(goody, Point, vars, Rect)
 {    
     function Map(json)
     {
@@ -8,32 +8,34 @@ function(goody, Point, vars, Rect, Tile)
         this.pixelWidth = this.width * vars.tileDimension;
         this.pixelHeight = this.height * vars.tileDimension;
         this.length = json.layers[0].data.length;
-        this.displayedLayers = 3;
-        // convert to tiles option 
-        // nope that broke it so sadly
+        this.displayedLayers = 3;   // for now, unsure, but there are 3 BG layers
+
+        // Height of each tile - used for display and collision
         this.heightMap = [];
+        // Maps of the current elements
+        this.elementMap = {};
+        // Layers of the map, used for display
         this.imageMap = [];
+        // Objects
         this.objects = [];
-        
-        // Okay. 3 maps, one for each of the variables
-        // height map
-        // 3 layer image map
-        // objects + MC
-        // for now, render depening on the layer thing
-        // Everything in objects renders by height1
-        // this.layers = [];
-        // var layers = json.layers;
-        // for (var i = 0; i < layers.length; i++)
-        // {
-        //     if (layers[i].name != "Collide")
-        //     {
-        //         this.layers.push(layers[i].data);
-        //     }
-        //     else
-        //     {
-        //        this.generateWalls(layers[i].data);
-        //     }
-        // }
+
+        var layers = json.layers;
+        for (var i = 0; i < layers.length; i++)
+        {
+            var name = layers[i].name;
+            if (goody.stringContains(name, "BG")) {
+                this.imageMap.push(layers[i].data);
+            }
+            else if (name == "height") {
+                this.heightMap = layers[i].data;
+            }
+            else if (name == "Objects") {
+                this.objects = layers[i].data;
+            }
+            else {
+                this.elementMap[name] = layers[i].data;
+            }
+        }
     }
 
     Map.prototype.indexUp = function(n) { return n + this.width; };
@@ -42,13 +44,13 @@ function(goody, Point, vars, Rect, Tile)
     Map.prototype.indexLeft = function(n) { return n - 1; };
 
     Map.prototype.findRow = function(tileNumber){
-        return Math.trunc(tileNumber / this.width);
+        return Math.floor(tileNumber / this.width);
     }
     Map.prototype.findColumn = function(tileNumber) {
         return tileNumber % this.width; 
     }
 
-    Map.prototype.findTilebyIndex = function(tile) {
+    Map.prototype.findZonebyIndex = function(tile) {
         // return order [upperLeft, upperRight, lowerLeft, lowerRight];
         var evenRow = this.findRow(tile) % 2 == 0;
         var evenColumn = this.findColumn(tile)% 2 == 0;
@@ -66,12 +68,23 @@ function(goody, Point, vars, Rect, Tile)
         }
     }
 
+    // Map.prototype.findZonebyPixel = function(pixelPoint) {
+    //     return this.findTilebyIndex(this.tileToPixel(pixelPoint));
+    // }
 
-    Map.prototype.findTilebyPixel = function(pixelPoint) {
-        return findTilebyIndex(convertpixelpoint());
+    Map.prototype.getHeight = function(tileIndex) {
+        return this.heightMap[tileIndex];
     }
 
-    // Map.prototype.pixelPoint = function(tileNumber) { return new Point.Point(tileNumber%this.width * vars.tileDimension, Math.floor(tileNumber/this.width) * vars.tileDimension); };
+    Map.prototype.pixelToTile = function(point) {
+        var column =  Math.floor(point.x/vars.tileDimension);
+        var row = Math.floor(point.y/vars.tileDimension);
+        return row * this.width + column;
+    }
+    
+    Map.prototype.tileToPixel = function(tileNumber) { 
+        return new Point.Point(tileNumber%this.width * vars.tileDimension, Math.floor(tileNumber/this.width) * vars.tileDimension); 
+    };
         
     return {
         Map: Map

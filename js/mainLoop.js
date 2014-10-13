@@ -1,5 +1,5 @@
-define(["entities/MainChar", "display/Camera", "entities/Cursor", "levels/maps", "assets/vars", "map/Map"],
-function(MainChar, Camera, Cursor, maps, vars, Map)
+define(["entities/MainChar", "display/Camera", "entities/Cursor", "levels/maps", "assets/vars", "map/Map", "physics/CollisionHandler"],
+function(MainChar, Camera, Cursor, maps, vars, Map, CollisionHandler)
 {
     function mainLoop()
     {
@@ -8,10 +8,11 @@ function(MainChar, Camera, Cursor, maps, vars, Map)
         this.canvas.height = vars.displayHeight;
         this.input = [false, false, false, false]; // up right down left
         this.ctx = this.canvas.getContext('2d');
+        this.collisionHandler = new CollisionHandler.CollisionHandler();
         this.camera = new Camera.Camera();
         this.MC = new MainChar.MainChar(600,600, 2.5);
         
-        this.map = new Map.Map(maps.test_1);
+        this.map = new Map.Map(maps.debug_0);
         this.camera.loadMap(this.map);
                 
         this.element = 0; 
@@ -45,7 +46,7 @@ function(MainChar, Camera, Cursor, maps, vars, Map)
             this.element = this.element + 1 == 6 ? 0 : this.element + 1;
             this.cursor.setElement(this.element);
         }
-        else //keyup or keydown
+        else //keyup or keydown, change this to use jquery...
         {
             if (event.keyCode == 87) // up w
             { 
@@ -100,7 +101,7 @@ function(MainChar, Camera, Cursor, maps, vars, Map)
     
     mainLoop.prototype.update = function()
     {
-        this.MC.update(this.input, this.map);
+        this.MC.update(this.input, this.map, this.collisionHandler);
         this.draw();
     };
     
