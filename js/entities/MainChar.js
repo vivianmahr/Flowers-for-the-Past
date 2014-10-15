@@ -3,16 +3,17 @@ function(Entity, images, Point, goody, vars)
 {    
     function MainChar(x, y, z)
     {
-        Entity.Entity.call(x, y, z);
+        Entity.Entity.call(this, x, y, z);
         this.image = images.BaseTiles;
-        this.accel = 1.5;
         this.friction = .7;
-        this._velCap = 3;
+        this.accel = 1.5;
         this.rect.width = 21;
         this.rect.height = 27;
         this.xOffset = 0;
+        this.floatOffset = 0;
+        this.targetFloatOffset = 0;
     }
-    
+      
     MainChar.prototype = new Entity.Entity();
     MainChar.prototype.constructor = MainChar;
     
@@ -41,15 +42,42 @@ function(Entity, images, Point, goody, vars)
                 this.xOffset = 0;
             }        
             //this.velocity = this.velocity.add(this.acceleration);
-            if (this.velocity.length() > this._velCap)
+            if (this.velocity.length() > this.velCap)
             {
-                this.velocity.setLength(this._velCap);
+                this.velocity.setLength(this.velCap);
             }; 
-            // going in the opposite direction should be more efficient than stopping
+            // should going in the opposite direction should be more efficient than stopping
         }
         else
         {
             this.velocity.mult(this.friction);
+        }
+        if (Math.abs(this.floatOffset - this.targetFloatOffset) < 0.5 && this.floatOffset !== this.targetFloatOffset) {
+            this.floatOffset = this.targetFloatOffset;
+            if (this.movementAttributes.temperature != 2) // falling to ground level I'm not sure if this should be not 0
+            {
+                var currentTiles = collisionHandler.collidingTiles(map, this.rect);
+                var currentHeights = [];
+                for (var i=0; i<currentTiles.length; i++) {
+                    var tileHeight = map.getHeight(currentTiles[i]);
+                    if (!goody.inArray(currentHeights, tileHeight)) {
+                        currentHeights.push(tileHeight);
+                    }
+                }
+                console.log(currentHeights);
+                this.movementAttributes.airborne = false;
+                this.movementAttributes.height = 3; // highest height you're sitting on
+                //if landing on a nojump tile...probably move to the closest non-no-jump tile
+                var onTiles = collisionHandler.collidingTiles(map, this.rect);
+                for (var i=0; i<onTiles.length; i++){
+                    /// slide off
+                }
+            }
+//            this.movementAttributes.height = this.targetHeight;
+        }
+        else 
+        {
+            this.floatOffset += (this.targetFloatOffset - this.floatOffset)/6;
         }
         this.move(map, collisionHandler);
     }
@@ -63,7 +91,7 @@ function(Entity, images, Point, goody, vars)
             24,                                                         //imageWidth on Source
             48,                                                         //imageHeight on Source
             this.rect.position.x + offset.x - 3,                        //xPosCanvas    
-            this.rect.position.y + offset.y - 24,                       //yPosCanvas, integer offsets are for centering  
+            this.rect.position.y + offset.y - 24 + this.floatOffset,                       //yPosCanvas, integer offsets are for centering  
             24,                                                         //imageWidth on Canvas
             48                                                          //imageHeight on Canvas                
         )
@@ -71,81 +99,96 @@ function(Entity, images, Point, goody, vars)
     
     MainChar.prototype.move = function(map, collisionHandler)
     {
-        var dx = this.velocity.x;
-        var dy = this.velocity.y;
+        this.moveAxis("x", this.velocity.x, collisionHandler, map);
+        this.moveAxis("y", this.velocity.y, collisionHandler, map);
+    }
+
+    MainChar.prototype.moveAxis = function(axis, distance, collisionHandler, map) {
+        var isXaxis = axis === "x";
         var currentTiles = collisionHandler.collidingTiles(map, this.rect);
 
-        this.rect.position.x += dx;
+        if (isXaxis) { 
+            this.rect.position.x = goody.cap(this.rect.position.x+distance, 0, map.pixelWidth-this.rect.width-1); 
+        } 
+        else { 
+            this.rect.position.y = goody.cap(this.rect.position.y+distance, 0, map.pixelHeight-this.rect.height-1); 
+        }
+
         var newTiles = collisionHandler.collidingTiles(map, this.rect);
 
         for (var i = 0; i < newTiles.length; i++) {
-            if (!goody.inArray(currentTiles, newTiles[i])) {
+            if (!goody.inArray(currentTiles, newTiles[i])) { // There's a new tile effect to be applied
                 var newTile = newTiles[i];
-                if (map.getHeight(newTile) > this.movementAttributes.height) {
-                    if (dx > 0) // moving right, hit left side of wall
-                    {
-                        this.rect.setRight(map.tileToPixel(newTile).x-1);
+                // Height processing is first - if MC can't reach the tile, don't bother checking for effects
+                if (this.movementAttributes.airborne && Math.abs(map.getHeight(newTile) - this.movementAttributes.height) == 2) {
+                    continue;
+                }
+                if (map.isJump(newTile) && !this.movementAttributes.airborne){
+                    this.moveBack(isXaxis, distance, newTile, map);
+                    continue;
+                }
+                if (Math.abs(map.getHeight(newTile) - this.movementAttributes.height) >= 2 ) {
+                    this.moveBack(isXaxis, distance, newTile, map);
+                    continue;
+                }
+                else { // Elememtal effect needs to be applied
+                    // unsure to growth effects, but they will probably be applied first or last
+                    // var growthEffect = map.getElement(newTile, "Growth") != this.movementAttributes.growth;
+                    var humEffect = map.getElement(newTile, "Humidity") != this.movementAttributes.humidity;
+                    var tempEffect = map.getElement(newTile, "Temperature") != this.movementAttributes.temperature;
+
+                    // if (growthEffect) {console.log("growth");}
+                    if (humEffect) {
+                        var oldHumidity = this.movementAttributes.humidity;
+                        var newHumidity = map.getElement(newTile, "Humidity");
+                        this.movementAttributes.humidity = newHumidity;
+                        if (oldHumidity < newHumidity) { // should change to depend entirely on new hum cause going from dry directly to wet
+                            this.velCap = this.velCap*3;
+                        } // going onto a wetter surface
+                        else {
+                            this.velCap = this.velCap/3;
+                        }
                     }
-                    else if (dx < 0) // moving left, hit right side of wall
-                    {
-                        this.rect.setLeft(map.tileToPixel(newTile).x+vars.tileDimension+1);
+                    if (tempEffect) {
+                        var oldTemp = this.movementAttributes.temperature;
+                        var newTemp = map.getElement(newTile, "Temperature");
+                        this.movementAttributes.temperature = newTemp;
+                        if (newTemp === 2) { // heat
+                            this.movementAttributes.airborne = true;
+                            this.targetFloatOffset = -20;
+                        } 
+                        else {
+                            if (newTemp === 1) //neutral
+                            {
+                                this.targetFloatOffset = 0;
+                            }
+                            else {
+                                this.targetFloatOffset = 20;
+                            }
+                        }
                     }
                 }
             }
         }
+    }
 
-        currentTiles = collisionHandler.collidingTiles(map, this.rect);
-
-        this.rect.position.y += dy;
-        newTiles = collisionHandler.collidingTiles(map, this.rect);
-
-        for (var i = 0; i < newTiles.length; i++) {
-            if (!goody.inArray(currentTiles, newTiles[i])) {
-                newTile = newTiles[i]
-                if (map.getHeight(newTile) > this.movementAttributes.height) {
-                    if (dy > 0) // moving down, hit top side of wall
-                    {
-                        this.rect.setBottom(map.tileToPixel(newTile).y-1);
-                    }
-                    else if (dy < 0) // moving up, hit bottom side of wall
-                    {
-                        this.rect.setTop(map.tileToPixel(newTile).y+vars.tileDimension+1);
-                    }
-                }
-            }
+    MainChar.prototype.moveBack = function(isXaxis, distance, newTile, map){
+        if (isXaxis && distance > 0) // moving right, hit left side of wall
+        {
+            this.rect.setRight(map.tileToPixel(newTile).x-1);
         }
-
-        // for (var i = 0; i < wallLength; i++)
-        // {
-        //     if (this.rect.collideRect(walls[i]))
-        //     {
-        //         if (dx > 0) // moving right, hit left side of wall
-        //         {
-        //             this.rect.setRight(walls[i].getLeft()-1);
-        //         }
-        //         else if (dx < 0) // moving left, hit right side of wall
-        //         {
-        //             this.rect.setLeft(walls[i].getRight()+1);
-        //         }
-        //     }
-        // }
-        
-        // this.rect.position.y += dy;
-
-        // for (var i = 0; i < wallLength; i++)
-        // {
-        //     if (this.rect.collideRect(walls[i]))
-        //     {
-        //         if (dy > 0) // moving down, hit top side of wall
-        //         {
-        //             this.rect.setBottom(walls[i].getTop()-1);
-        //         }
-        //         else if (dy < 0) // moving up, hit bottom side of wall
-        //         {
-        //             this.rect.setTop(walls[i].getBottom()+1);
-        //         }
-        //     }
-        // }
+        else if (isXaxis && distance < 0) // moving left, hit right side of wall
+        {
+            this.rect.setLeft(map.tileToPixel(newTile).x+vars.tileDimension+1);
+        }
+        else if (distance > 0) // moving down, hit top side of wall
+        {
+            this.rect.setBottom(map.tileToPixel(newTile).y-1);
+        }
+        else // moving up, hit bottom side of wall
+        {
+            this.rect.setTop(map.tileToPixel(newTile).y+vars.tileDimension+1);
+        } 
     }
     
     return {

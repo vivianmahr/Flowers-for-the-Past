@@ -4,7 +4,6 @@ function(Point, goody, images, vars)
     function Camera()
     {
         this.offset = new Point.Point(0, 0); 
-        this.mapBase = images._000;
         this.buffer = [];
     }
     
@@ -28,19 +27,31 @@ function(Point, goody, images, vars)
             }
         }
     };
+
+    Camera.prototype.showString = function(string, ctx) {
+        ctx.font = "20px sans-serif";
+        ctx.fillStyle = "#FF0000";
+        ctx.fillText(string, 10, 20);
+    }
     
     Camera.prototype.display = function(canvas, ctx, map, MC, cursor, entities)
     {
         this._calcOffset(canvas, MC, map);
         var bufferLength = this.buffer.length;
+        var MCdrawn = false;
         for (var i=0; i < bufferLength; i++)
         {
             ctx.drawImage(this.buffer[i], this.offset.x, this.offset.y);
-            if ((i+0.5) == MC.movementAttributes.height)
+            if (i === MC.movementAttributes.height+1)
             {
                 MC.drawImage(ctx, this.offset);
                 MC.rect.draw(ctx, this.offset, "#FF00FF");
+                MCdrawn = true;
             }
+        }
+        if (!MCdrawn) {
+            MC.rect.draw(ctx, this.offset, "#FF00FF");
+            MC.drawImage(ctx, this.offset);
         }
         ctx.drawImage(
             images.cursor,                                   
@@ -53,7 +64,8 @@ function(Point, goody, images, vars)
             8,                                                         
             8                                                                       
         );
-        //for (var n = 0; n < map.walls.length; n++){ map.walls[n].draw(ctx, this.offset);}
+        //Debug menu 
+        this.showString("height=" + MC.movementAttributes.height.toString() + " jump=" + MC.movementAttributes.airborne, ctx);
     };
     
     Camera.prototype.renderTile = function(image, i, tile, map, ctx)

@@ -26,14 +26,17 @@ function(goody, Point, vars, Rect)
             if (goody.stringContains(name, "BG")) {
                 this.imageMap.push(layers[i].data);
             }
-            else if (name == "height") {
-                this.heightMap = layers[i].data;
+            else if (name == "Height") {
+                this.heightMap = layers[i].data.map( function(x) {return x-1;});
             }
             else if (name == "Objects") {
                 this.objects = layers[i].data;
             }
+            else if (name == "JumpFlag") {
+                this.jumpMap = layers[i].data;
+            }
             else {
-                this.elementMap[name] = layers[i].data;
+                this.elementMap[name] = layers[i].data.map( function(x) {return x-1;} );
             }
         }
     }
@@ -48,6 +51,10 @@ function(goody, Point, vars, Rect)
     }
     Map.prototype.findColumn = function(tileNumber) {
         return tileNumber % this.width; 
+    }
+
+    Map.prototype.isJump = function(tileIndex) {
+        return this.jumpMap[tileIndex] !== 0;
     }
 
     Map.prototype.findZonebyIndex = function(tile) {
@@ -74,6 +81,10 @@ function(goody, Point, vars, Rect)
 
     Map.prototype.getHeight = function(tileIndex) {
         return this.heightMap[tileIndex];
+    }
+
+    Map.prototype.getElement = function(tileIndex, element) {
+        return this.elementMap[element][tileIndex];
     }
 
     Map.prototype.pixelToTile = function(point) {

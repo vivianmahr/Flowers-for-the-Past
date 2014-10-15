@@ -10,15 +10,15 @@ function(MainChar, Camera, Cursor, maps, vars, Map, CollisionHandler)
         this.ctx = this.canvas.getContext('2d');
         this.collisionHandler = new CollisionHandler.CollisionHandler();
         this.camera = new Camera.Camera();
-        this.MC = new MainChar.MainChar(600,600, 2.5);
+        // this.MC = new MainChar.MainChar(500, 300, 2);
+        this.MC = new MainChar.MainChar(500, 500, 0);
         
-        this.map = new Map.Map(maps.debug_0);
+        this.map = new Map.Map(maps.debug_3);
         this.camera.loadMap(this.map);
                 
         this.element = 0; 
         this.cursor = new Cursor.Cursor(this.element);
-        this.resizeCanvas();
-        
+        this.resizeCanvas();  
     };
     
     mainLoop.prototype.resizeCanvas = function()

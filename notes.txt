@@ -3,8 +3,9 @@ er, change how map, collisionHandler, and entities are procesed in the main loo
 
 perhaps change the structure to 
 
-collisionHandler
-
 level
     map
     entities
+
+take out collisionhandler, it should just be processed in map
+
