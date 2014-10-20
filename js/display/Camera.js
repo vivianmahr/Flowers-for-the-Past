@@ -42,7 +42,7 @@ function(Point, goody, images, vars)
         for (var i=0; i < bufferLength; i++)
         {
             ctx.drawImage(this.buffer[i], this.offset.x, this.offset.y);
-            if (i === MC.movementAttributes.height+1)
+            if (i === MC.movementAttributes.height + 1 + MC.movementAttributes.airborne ? 1 : 0)
             {
                 MC.drawImage(ctx, this.offset);
                 MC.rect.draw(ctx, this.offset, "#FF00FF");
@@ -65,7 +65,8 @@ function(Point, goody, images, vars)
             8                                                                       
         );
         //Debug menu 
-        this.showString("height=" + MC.movementAttributes.height.toString() + " jump=" + MC.movementAttributes.airborne, ctx);
+        var scrap = MC.movementAttributes;
+        this.showString("height=" + scrap.height + " air=" + scrap.airborne + " sink=" + scrap.sinking, ctx);
     };
     
     Camera.prototype.renderTile = function(image, i, tile, map, ctx)

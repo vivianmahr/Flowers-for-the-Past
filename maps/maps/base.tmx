@@ -9,6 +9,11 @@
  <tileset firstgid="14" name="BaseTiles" tilewidth="24" tileheight="24">
   <image source="../../images/BaseTiles.png" width="192" height="192"/>
  </tileset>
+ <layer name="BG0" width="1" height="1">
+  <data encoding="csv">
+0
+</data>
+ </layer>
  <layer name="BG1" width="1" height="1">
   <data encoding="csv">
 0
@@ -19,27 +24,27 @@
 0
 </data>
  </layer>
- <layer name="BG3" width="1" height="1">
+ <layer name="Height" width="1" height="1">
   <data encoding="csv">
 0
 </data>
  </layer>
- <layer name="height" width="1" height="1">
+ <layer name="JumpFlag" width="1" height="1">
   <data encoding="csv">
 0
 </data>
  </layer>
- <layer name="LifeRot" width="1" height="1">
+ <layer name="Growth" width="1" height="1">
   <data encoding="csv">
 0
 </data>
  </layer>
- <layer name="HotCold" width="1" height="1">
+ <layer name="Temperature" width="1" height="1">
   <data encoding="csv">
 0
 </data>
  </layer>
- <layer name="DryWet" width="1" height="1">
+ <layer name="Humidity" width="1" height="1">
   <data encoding="csv">
 0
 </data>

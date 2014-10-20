@@ -3,7 +3,8 @@ function()
 {
     return {
         MC: images.MC,
-        cursor: images.cursor,
+         cursor: images.cursor,
+ /*
         _000: images._000,
         _100: images._100,
         _n100: images._n100,
@@ -12,6 +13,7 @@ function()
         _001: images._001,
         _00n1: images._00n1,
         _debug: images._debug,
+        */
         BaseTiles: images.BaseTiles
     }
 });

@@ -15,7 +15,7 @@ function(Entity, images, Point, goody, vars)
     }
       
     MainChar.prototype = new Entity.Entity();
-    MainChar.prototype.constructor = MainChar;
+    // MainChar.prototype.constructor = MainChar;
     
     MainChar.prototype.update = function(input, map, collisionHandler)
     {
@@ -52,7 +52,8 @@ function(Entity, images, Point, goody, vars)
         {
             this.velocity.mult(this.friction);
         }
-        if (Math.abs(this.floatOffset - this.targetFloatOffset) < 0.5 && this.floatOffset !== this.targetFloatOffset) {
+        if (this.floatOffset !== this.targetFloatOffset && Math.abs(this.floatOffset - this.targetFloatOffset) < 0.5) {
+            // ^ If it's close enough to being exact or the same
             this.floatOffset = this.targetFloatOffset;
             if (this.movementAttributes.temperature != 2) // falling to ground level I'm not sure if this should be not 0
             {
@@ -63,10 +64,9 @@ function(Entity, images, Point, goody, vars)
                     if (!goody.inArray(currentHeights, tileHeight)) {
                         currentHeights.push(tileHeight);
                     }
-                }
-                console.log(currentHeights);
+                }   
                 this.movementAttributes.airborne = false;
-                this.movementAttributes.height = 3; // highest height you're sitting on
+                this.movementAttributes.height = Math.max.apply(Math, currentHeights); // highest height you're sitting on
                 //if landing on a nojump tile...probably move to the closest non-no-jump tile
                 var onTiles = collisionHandler.collidingTiles(map, this.rect);
                 for (var i=0; i<onTiles.length; i++){
@@ -120,57 +120,69 @@ function(Entity, images, Point, goody, vars)
             if (!goody.inArray(currentTiles, newTiles[i])) { // There's a new tile effect to be applied
                 var newTile = newTiles[i];
                 // Height processing is first - if MC can't reach the tile, don't bother checking for effects
-                if (this.movementAttributes.airborne && Math.abs(map.getHeight(newTile) - this.movementAttributes.height) == 2) {
+                var heightDifference = map.getHeight(newTile) - this.movementAttributes.height;
+                if (this.movementAttributes.airborne && (heightDifference === 2 || heightDifference === 3)) {
+                    this.applyTempChange(map, newTile);
                     continue;
                 }
                 if (map.isJump(newTile) && !this.movementAttributes.airborne){
                     this.moveBack(isXaxis, distance, newTile, map);
                     continue;
                 }
-                if (Math.abs(map.getHeight(newTile) - this.movementAttributes.height) >= 2 ) {
+                if (map.getHeight(newTile) - this.movementAttributes.height >= 2 ) {
                     this.moveBack(isXaxis, distance, newTile, map);
                     continue;
                 }
-                else { // Elememtal effect needs to be applied
-                    // unsure to growth effects, but they will probably be applied first or last
-                    // var growthEffect = map.getElement(newTile, "Growth") != this.movementAttributes.growth;
-                    var humEffect = map.getElement(newTile, "Humidity") != this.movementAttributes.humidity;
-                    var tempEffect = map.getElement(newTile, "Temperature") != this.movementAttributes.temperature;
+                if (!this.movementAttributes.airborne && (map.getHeight(newTile) - this.movementAttributes.height <= -2) ) {
+                    this.moveBack(isXaxis, distance, newTile, map);
+                    continue;
+                }
+                // Elememtal effect needs to be applied and possibly height
+                // unsure to growth effects, but they will probably be applied first or last
+                // var growthEffect = map.getElement(newTile, "Growth") != this.movementAttributes.growth;
+                this.movementAttributes.height = map.getHeight(newTile);
+                var humEffect = map.getElement(newTile, "Humidity") != this.movementAttributes.humidity;
+                var tempEffect = map.getElement(newTile, "Temperature") != this.movementAttributes.temperature;
 
-                    // if (growthEffect) {console.log("growth");}
-                    if (humEffect) {
-                        var oldHumidity = this.movementAttributes.humidity;
-                        var newHumidity = map.getElement(newTile, "Humidity");
-                        this.movementAttributes.humidity = newHumidity;
-                        if (oldHumidity < newHumidity) { // should change to depend entirely on new hum cause going from dry directly to wet
-                            this.velCap = this.velCap*3;
-                        } // going onto a wetter surface
-                        else {
-                            this.velCap = this.velCap/3;
-                        }
-                    }
-                    if (tempEffect) {
-                        var oldTemp = this.movementAttributes.temperature;
-                        var newTemp = map.getElement(newTile, "Temperature");
-                        this.movementAttributes.temperature = newTemp;
-                        if (newTemp === 2) { // heat
-                            this.movementAttributes.airborne = true;
-                            this.targetFloatOffset = -20;
-                        } 
-                        else {
-                            if (newTemp === 1) //neutral
-                            {
-                                this.targetFloatOffset = 0;
-                            }
-                            else {
-                                this.targetFloatOffset = 20;
-                            }
-                        }
-                    }
+                // if (growthEffect) {console.log("growth");}
+                if (humEffect) {
+                    this.applyHumChange(map, newTile);
+                }
+                if (tempEffect) {
+                    this.applyTempChange(map, newTile);
                 }
             }
         }
     }
+
+    MainChar.prototype.applyTempChange = function(map, newTile) {
+        var oldTemp = this.movementAttributes.temperature;
+        var newTemp = map.getElement(newTile, "Temperature");
+        this.movementAttributes.temperature = newTemp;
+        if (newTemp != oldTemp)
+        {
+            if (newTemp === 2) { // heat
+                this.movementAttributes.airborne = true;
+                this.movementAttributes.height = map.getHeight(newTile) + 3;
+                this.targetFloatOffset = -20;
+            } 
+            else if (newTemp === 1) //neutral
+            {
+                this.targetFloatOffset = 0;
+            }
+            else {
+                this.movementAttributes.sinking = true;
+                this.targetFloatOffset = 20;
+            }        
+        }
+    }
+
+    MainChar.prototype.applyHumChange = function(map, newTile) {
+        var oldHumidity = this.movementAttributes.humidity;
+        var newHumidity = map.getElement(newTile, "Humidity");
+        this.movementAttributes.humidity = newHumidity;
+        this.velCap = this.velCap * Math.pow(3, (newHumidity - oldHumidity));
+     }
 
     MainChar.prototype.moveBack = function(isXaxis, distance, newTile, map){
         if (isXaxis && distance > 0) // moving right, hit left side of wall

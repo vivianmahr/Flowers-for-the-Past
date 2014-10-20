@@ -11,7 +11,8 @@ function(Point, goody, Rect)
             "temperature": 1,
             "humidity": 1, 
             "growth": 1,
-            "airborne": false
+            "airborne": false,
+            "sinking": false
         }
     }
     
