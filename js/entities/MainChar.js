@@ -1,45 +1,45 @@
-define(["entities/Entity", "assets/images", "util/Point", "util/goody", "assets/vars"],
-function(Entity, images, Point, goody, vars)
+define(["display/Animation", "entities/Entity", "assets/images", "util/Point", "util/goody", "assets/vars"],
+function(Animation, Entity, images, Point, goody, vars)
 {    
     function MainChar(x, y, z)
     {
         Entity.Entity.call(this, x, y, z);
         this.image = images.BaseTiles;
+        this.velCap = 3;
         this.friction = .7;
         this.accel = 1.5;
         this.rect.width = 21;
         this.rect.height = 27;
-        this.xOffset = 0;
         this.floatOffset = 0;
         this.targetFloatOffset = 0;
+        this.sprite = new Animation.Animation(images.MC, 4, 24, 48);
     }
       
     MainChar.prototype = new Entity.Entity();
-    // MainChar.prototype.constructor = MainChar;
     
-    MainChar.prototype.update = function(input, map, collisionHandler)
+    MainChar.prototype.update = function(input, map, collisionHandler, timeDelta)
     {
         if (input[0] + input[1] + input[2] + input[3])
         {
             if (input[0]) // up
             {   
                 this.velocity.y -= this.accel;
-                this.xOffset = 48;
+                this.sprite.orient("U");
             }
             if (input[1]) // right
             {
                 this.velocity.x += this.accel;
-                this.xOffset = 72;
+                this.sprite.orient("R");
             }
             if (input[2]) //down
             {
                 this.velocity.y += this.accel;
-                this.xOffset = 24;
+                this.sprite.orient("D");
             }
             if (input[3]) // left
             {
                 this.velocity.x -= this.accel;
-                this.xOffset = 0;
+                this.sprite.orient("L");
             }        
             //this.velocity = this.velocity.add(this.acceleration);
             if (this.velocity.length() > this.velCap)
@@ -67,40 +67,27 @@ function(Entity, images, Point, goody, vars)
                 }   
                 this.movementAttributes.airborne = false;
                 this.movementAttributes.height = Math.max.apply(Math, currentHeights); // highest height you're sitting on
-                //if landing on a nojump tile...probably move to the closest non-no-jump tile
-                var onTiles = collisionHandler.collidingTiles(map, this.rect);
-                for (var i=0; i<onTiles.length; i++){
-                    /// slide off
-                }
+
             }
-//            this.movementAttributes.height = this.targetHeight;
         }
         else 
         {
-            this.floatOffset += (this.targetFloatOffset - this.floatOffset)/6;
+            this.floatOffset += (this.targetFloatOffset - this.floatOffset)/2;
         }
-        this.move(map, collisionHandler);
+        this.move(map, collisionHandler, timeDelta);
+        // fuck shaking
+        this.sprite.update();
     }
     
     MainChar.prototype.drawImage = function(ctx, offset)
     {
-        ctx.drawImage(
-            this.image,                                                 //image
-            this.xOffset,                                               //x position on image
-            0,                                                          //y position on image
-            24,                                                         //imageWidth on Source
-            48,                                                         //imageHeight on Source
-            this.rect.position.x + offset.x - 3,                        //xPosCanvas    
-            this.rect.position.y + offset.y - 24 + this.floatOffset,                       //yPosCanvas, integer offsets are for centering  
-            24,                                                         //imageWidth on Canvas
-            48                                                          //imageHeight on Canvas                
-        )
+        this.sprite.display(ctx, new Point.Point(this.rect.position.x + offset.x - 3, this.rect.position.y + offset.y - 24 + this.floatOffset))
     }
     
-    MainChar.prototype.move = function(map, collisionHandler)
+    MainChar.prototype.move = function(map, collisionHandler, timeDelta)
     {
-        this.moveAxis("x", this.velocity.x, collisionHandler, map);
-        this.moveAxis("y", this.velocity.y, collisionHandler, map);
+        this.moveAxis("x", this.velocity.x * timeDelta/9, collisionHandler, map);
+        this.moveAxis("y", this.velocity.y * timeDelta/9, collisionHandler, map);
     }
 
     MainChar.prototype.moveAxis = function(axis, distance, collisionHandler, map) {

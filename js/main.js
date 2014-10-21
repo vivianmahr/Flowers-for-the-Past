@@ -1,9 +1,8 @@
 function start() {
-    require(["mainLoop", "assets/images"],
-    function(mainLoop) 
+    require(["mainLoop", "assets/vars"],
+    function(mainLoop, vars) 
     {    
         var main = new mainLoop.mainLoop();
-        function draw() { main.update(); }
         function resize() { main.resizeCanvas(); }
         function ev(event) { main.updateInput(event); }
         
@@ -17,7 +16,31 @@ function start() {
         window.addEventListener('keyup', ev);
         window.addEventListener('keydown', ev);
         
-        window.setInterval(draw, 10);
+        // not sure what this does
+        var vendors = ['webkit', 'moz'];
+        for (var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
+            window.requestAnimationFrame = window[vendors[x] + 'RequestAnimationFrame'];
+            window.cancelAnimationFrame = window[vendors[x] + 'CancelAnimationFrame'] || window[vendors[x] + 'CancelRequestAnimationFrame'];
+        }
+
+        var lastTime = (new Date()).getTime();
+        var currentTime = 0;
+        var timeDelta = 0;
+
+        function start() {
+            window.requestAnimationFrame(start);
+            currentTime = (new Date()).getTime();
+            timeDelta = currentTime - lastTime;
+            if(timeDelta > vars.interval) 
+            {
+                main.update(timeDelta); 
+                timeDelta = 0;           
+                lastTime = currentTime;
+            }
+        }
+
+        start();
+
     });
 }
 

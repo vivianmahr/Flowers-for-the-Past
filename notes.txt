@@ -9,3 +9,4 @@ level
 
 take out collisionhandler, it should just be processed in map
 
+https://hacks.mozilla.org/2011/08/animating-with-javascript-from-setinterval-to-requestanimationframe/

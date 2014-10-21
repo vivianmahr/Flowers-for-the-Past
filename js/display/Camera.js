@@ -45,25 +45,26 @@ function(Point, goody, images, vars)
             if (i === MC.movementAttributes.height + 1 + MC.movementAttributes.airborne ? 1 : 0)
             {
                 MC.drawImage(ctx, this.offset);
-                MC.rect.draw(ctx, this.offset, "#FF00FF");
+                // MC.rect.draw(ctx, this.offset, "#FF00FF");
                 MCdrawn = true;
             }
         }
         if (!MCdrawn) {
-            MC.rect.draw(ctx, this.offset, "#FF00FF");
+            // MC.rect.draw(ctx, this.offset, "#FF00FF");
             MC.drawImage(ctx, this.offset);
         }
-        ctx.drawImage(
-            images.cursor,                                   
-            cursor.offset.x,                                        
-            0,                                                   
-            5,                                                 
-            5,                                               
-            cursor.position.x,                              
-            cursor.position.y,                                        
-            8,                                                         
-            8                                                                       
-        );
+        cursor.display(ctx);
+        // ctx.drawImage(
+        //     images.cursor,                                   
+        //     cursor.offset.x,                                        
+        //     0,                                                   
+        //     5,                                                 
+        //     5,                                               
+        //     cursor.position.x,                              
+        //     cursor.position.y,                                        
+        //     8,                                                         
+        //     8                                                                       
+        // );
         //Debug menu 
         var scrap = MC.movementAttributes;
         this.showString("height=" + scrap.height + " air=" + scrap.airborne + " sink=" + scrap.sinking, ctx);

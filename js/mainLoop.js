@@ -10,7 +10,7 @@ function(MainChar, Camera, Cursor, maps, vars, Map, CollisionHandler)
         this.ctx = this.canvas.getContext('2d');
         this.collisionHandler = new CollisionHandler.CollisionHandler();
         this.camera = new Camera.Camera();
-        // this.MC = new MainChar.MainChar(500, 300, 2);
+
         this.MC = new MainChar.MainChar(500, 500, 0);
         
         this.map = new Map.Map(maps.debug_3);
@@ -99,9 +99,10 @@ function(MainChar, Camera, Cursor, maps, vars, Map, CollisionHandler)
         this.camera.display(this.canvas, this.ctx, this.map, this.MC, this.cursor, []);
     };
     
-    mainLoop.prototype.update = function()
+    mainLoop.prototype.update = function(delta)
     {
-        this.MC.update(this.input, this.map, this.collisionHandler);
+        this.MC.update(this.input, this.map, this.collisionHandler, delta);
+        this.cursor.update();
         this.draw();
     };
     

@@ -2,8 +2,9 @@ define([],
 function()
 {
     return {
-        MC: images.MC,
+         MC: images.MC,
          cursor: images.cursor,
+         dragonfly: images.dragonfly,
  /*
         _000: images._000,
         _100: images._100,
