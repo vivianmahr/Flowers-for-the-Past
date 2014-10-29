@@ -1,5 +1,5 @@
-define(["entities/MainChar", "display/Camera", "entities/Cursor", "levels/maps", "assets/vars", "map/Map", "physics/CollisionHandler"],
-function(MainChar, Camera, Cursor, maps, vars, Map, CollisionHandler)
+define(["util/goody", "entities/MainChar", "display/Camera", "entities/Cursor", "levels/maps", "assets/vars", "map/Map", "physics/CollisionHandler"],
+function(goody, MainChar, Camera, Cursor, maps, vars, Map, CollisionHandler)
 {
     function mainLoop()
     {
@@ -29,70 +29,43 @@ function(MainChar, Camera, Cursor, maps, vars, Map, CollisionHandler)
     
     mainLoop.prototype.updateInput = function(event)
     {   
-        if (event.type == "mousemove")
-        {
+        if (event.type == "mousemove") {
             this.cursor.move(event.layerX, event.layerY);
         }
-        else if (event.type == "click")
-        {
+        else if (event.type === "click") {
             var x = Math.floor((event.layerX-this.camera.offset.x)/(vars.tileDimension));
             var y = Math.floor((event.layerY-this.camera.offset.y)/(vars.tileDimension));
             var changeIndex = x + y * this.map.width;
-            //this.map.bg[changeIndex] = this.applyElement(this.map.bg[changeIndex]);
-            this.map.layers[3].data[changeIndex] = 13;
+            console.log(changeIndex);
+
+            console.log($("canvas").width());
+            // this.map.applyElement(changeIndex, this.element);
         }
-        else if (event.type == "contextmenu")
+        else if (event.type === "contextmenu")
         {
-            this.element = this.element + 1 == 6 ? 0 : this.element + 1;
+            this.element = goody.incrementLoop(this.element, 6);
             this.cursor.setElement(this.element);
         }
         else //keyup or keydown, change this to use jquery...
         {
-            if (event.keyCode == 87) // up w
+            if (event.keyCode === 87) // up w
             { 
-                this.input[0] = event.type == "keydown";
+                this.input[0] = event.type === "keydown";
             }
-            else if (event.keyCode == 68) // right d
+            else if (event.keyCode === 68) // right d
             {
                 this.input[1] = event.type == "keydown";
             }
-            else if (event.keyCode == 83) // down s
+            else if (event.keyCode === 83) // down s
             {
-                this.input[2] = event.type == "keydown";
+                this.input[2] = event.type === "keydown";
             }
-            else if (event.keyCode == 65) // left a
+            else if (event.keyCode === 65) // left a
             {
-                this.input[3] = event.type == "keydown";
+                this.input[3] = event.type === "keydown";
             }
         }
     }; 
-    
-    mainLoop.prototype.applyElement = function(tile)
-    {
-        var index = (tile-1)%81
-        var el = this.element;
-        if (el < 2)// wet, dry
-        {
-            var hum = Math.floor((index%27)/9);
-            if ((el==0 && hum==2) || (el==1 && hum==0)) { return tile; }
-            if (el==0) { return (tile + 9); } //wet
-            return tile-9; // dry
-        }
-        else if (el < 4) // life, rot
-        {
-            var life = Math.floor(index/27);
-            if ((el==2 && life==2) || (el==3 && life==0)) { return tile; }
-            if (el==2) { return (tile + 27); } //life
-            return tile-27; // dry
-        }
-        else // hot, cold
-        {
-            var temp =  Math.floor(index/3)%3;
-            if ((el==4 && temp==2) || (el==5 && temp==0)) { return tile; }
-            if (el==4) { return (tile + 3); } //hot
-            return tile-3; // rot
-        }
-    };
     
     mainLoop.prototype.draw = function()
     {

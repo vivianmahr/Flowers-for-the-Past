@@ -1,15 +1,3 @@
-Make collide rects align with MC display position
-
-Collision - clean up, corner problems
-
-Make MC collision rect on bottom of character
-
-Maps - 4x4 tiles 
-
-
-rewrite maps.py
-
-substitution Json -> base tile, U, R, and oher edges 
 
 
 
@@ -17,10 +5,7 @@ substitution Json -> base tile, U, R, and oher edges
 
 Future
 
-Animations
 
-Give each layer its own buffer 
-	Z axis occlusion
 
 Sound
 

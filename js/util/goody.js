@@ -40,6 +40,10 @@ function(goody)
         }
         return false;
     }
+
+    function incrementLoop(num, max) {
+        return num + 1 === max ? 0 : max + 1;
+    }
     
     return {
         optional:optional,
@@ -47,6 +51,7 @@ function(goody)
         randint:randint,
         allSame: allSame,
         stringContains: stringContains,
-        inArray: inArray
+        inArray: inArray,
+        incrementLoop: incrementLoop
     };
 });

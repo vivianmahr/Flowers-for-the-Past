@@ -1,6 +1,6 @@
 er, change how map, collisionHandler, and entities are procesed in the main loo
 
-
+HUM, TEMP GROWTH
 perhaps change the structure to 
 
 level
