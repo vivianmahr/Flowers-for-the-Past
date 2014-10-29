@@ -1,23 +1,28 @@
-define(["util/goody", "entities/MainChar", "display/Camera", "entities/Cursor", "levels/maps", "assets/vars", "map/Map", "physics/CollisionHandler"],
-function(goody, MainChar, Camera, Cursor, maps, vars, Map, CollisionHandler)
+define(["util/goody", "entities/MainChar", "display/MapCamera", "entities/Cursor", "levels/maps", "assets/vars", "map/Map", "physics/CollisionHandler"],
+function(goody, MainChar, MapCamera, Cursor, maps, vars, Map, CollisionHandler)
 {
     function mainLoop()
     {
         this.canvas = document.getElementById('canvas');
         this.canvas.width = vars.displayWidth;
         this.canvas.height = vars.displayHeight;
+
+        // Change to input handler..
         this.input = [false, false, false, false]; // up right down left
         this.ctx = this.canvas.getContext('2d');
-        this.collisionHandler = new CollisionHandler.CollisionHandler();
-        this.camera = new Camera.Camera();
 
-        this.MC = new MainChar.MainChar(500, 500, 0);
+        this.mapCamera = new MapCamera.MapCamera();
+        // this.menuCamera = new MenuCamera.MenuCamera();
+
         
-        this.map = new Map.Map(maps.debug_3);
-        this.camera.loadMap(this.map);
-                
-        this.element = 0; 
+        // cut this out or move to scene
         this.cursor = new Cursor.Cursor(this.element);
+        this.collisionHandler = new CollisionHandler.CollisionHandler();
+        this.MC = new MainChar.MainChar(500, 500, 0);
+        this.element = 0; 
+        this.map = new Map.Map(maps.debug_3);
+        this.mapCamera.loadMap(this.map);
+        
         this.resizeCanvas();  
     };
     
@@ -33,8 +38,8 @@ function(goody, MainChar, Camera, Cursor, maps, vars, Map, CollisionHandler)
             this.cursor.move(event.layerX, event.layerY);
         }
         else if (event.type === "click") {
-            var x = Math.floor((event.layerX-this.camera.offset.x)/(vars.tileDimension));
-            var y = Math.floor((event.layerY-this.camera.offset.y)/(vars.tileDimension));
+            var x = Math.floor((event.layerX-this.mapCamera.offset.x)/(vars.tileDimension));
+            var y = Math.floor((event.layerY-this.mapCamera.offset.y)/(vars.tileDimension));
             var changeIndex = x + y * this.map.width;
             console.log(changeIndex);
 
@@ -69,7 +74,7 @@ function(goody, MainChar, Camera, Cursor, maps, vars, Map, CollisionHandler)
     
     mainLoop.prototype.draw = function()
     {
-        this.camera.display(this.canvas, this.ctx, this.map, this.MC, this.cursor, []);
+        this.mapCamera.display(this.canvas, this.ctx, this.map, this.MC, this.cursor, []);
     };
     
     mainLoop.prototype.update = function(delta)

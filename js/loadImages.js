@@ -1,12 +1,23 @@
-images = {
-    MC: new Image(),
-    cursor: new Image(),
-    BaseTiles: new Image(),
-    dragonfly: new Image(),
-}
+var imageNames = [
+	"dragonfly",
+	"MC",
+	"BaseTiles"    
+]
 
-images.dragonfly.src = "images/dragonfly.png";
-images.MC.src = "images/MC.png";
-images.BaseTiles.src = "images/BaseTiles.png";
-images.cursor.src = "images/cursor.png";
-images.dragonfly.onload = start;
+var images = {};
+
+$(function() {  
+    var loaded = 0;
+    var numImages = imageNames.length;
+    for (var i = 0; i < numImages; i++) {
+        var index = imageNames[i];
+    	images[index] = new Image();
+        images[index].src = "images/" + index + ".png";
+        images[index].onload = function(){ 
+            loaded++;
+            if (loaded === numImages) {
+                start();
+            } 
+        }
+    }
+ });

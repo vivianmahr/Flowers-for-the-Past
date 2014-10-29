@@ -28,6 +28,7 @@ function start() {
         var timeDelta = 0;
 
         function start() {
+	console.log("inside inside");
             window.requestAnimationFrame(start);
             currentTime = (new Date()).getTime();
             timeDelta = currentTime - lastTime;
@@ -39,8 +40,6 @@ function start() {
             }
         }
 
-        start();
 
     });
 }
-
