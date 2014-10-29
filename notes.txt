@@ -1,5 +1,4 @@
 er, change how map, collisionHandler, and entities are procesed in the main loo
-WHY IS IT NOT WORKING IN LINUX?!
 
 
 HUM, TEMP GROWTH

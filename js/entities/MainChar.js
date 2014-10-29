@@ -1,9 +1,12 @@
 define(["display/Animation", "entities/Entity", "assets/images", "util/Point", "util/goody", "assets/vars"],
 function(Animation, Entity, images, Point, goody, vars)
 {    
+    MainChar.prototype = new Entity.Entity();
+    MainChar.prototype.constructor = MainChar;
+
     function MainChar(x, y, z)
     {
-        Entity.Entity.call(this, x, y, z);
+        Entity.Entity.apply(this, arguments);
         this.image = images.BaseTiles;
         this.velCap = 3;
         this.friction = .7;
@@ -14,29 +17,27 @@ function(Animation, Entity, images, Point, goody, vars)
         this.targetFloatOffset = 0;
         this.sprite = new Animation.Animation(images.MC, 4, 24, 48);
     }
-      
-    MainChar.prototype = new Entity.Entity();
-    
+
     MainChar.prototype.update = function(input, map, collisionHandler, timeDelta)
     {
-        if (input[0] + input[1] + input[2] + input[3])
+        if (input.up || input.down || input.right || input.left) // if moving
         {
-            if (input[0]) // up
+            if (input.up) // up
             {   
                 this.velocity.y -= this.accel;
                 this.sprite.orient("U");
             }
-            if (input[1]) // right
+            if (input.right) // right
             {
                 this.velocity.x += this.accel;
                 this.sprite.orient("R");
             }
-            if (input[2]) //down
+            if (input.down) //down
             {
                 this.velocity.y += this.accel;
                 this.sprite.orient("D");
             }
-            if (input[3]) // left
+            if (input.left) // left
             {
                 this.velocity.x -= this.accel;
                 this.sprite.orient("L");
@@ -75,7 +76,7 @@ function(Animation, Entity, images, Point, goody, vars)
             this.floatOffset += (this.targetFloatOffset - this.floatOffset)/2;
         }
         this.move(map, collisionHandler, timeDelta);
-        // fuck shaking
+        // shaking anim of lazy
         this.sprite.update();
     }
     
