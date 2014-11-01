@@ -1,7 +1,9 @@
 var imageNames = [
 	"dragonfly",
 	"MC",
-	"BaseTiles"    
+	"BaseTiles" ,
+    "startButton",
+    "titleScreen"   
 ]
 
 var images = {};

@@ -1,5 +1,5 @@
-define(["scene/MapScene", "input/InputHandler","util/goody", "entities/MainChar", "display/MapCamera", "levels/maps", "assets/vars", "map/Map", "physics/CollisionHandler"],
-function(MapScene, InputHandler, goody, MainChar, MapCamera, maps, vars, Map, CollisionHandler)
+define(["util/Point", "input/Button", "scene/MenuScene", "scene/MapScene", "input/InputHandler","util/goody", "entities/MainChar", "display/MapCamera", "levels/maps", "assets/vars", "map/Map", "physics/CollisionHandler"],
+function(Point, Button, MenuScene, MapScene, InputHandler, goody, MainChar, MapCamera, maps, vars, Map, CollisionHandler)
 {
     function mainLoop() {
         this.canvas = document.getElementById('canvas');
@@ -14,6 +14,16 @@ function(MapScene, InputHandler, goody, MainChar, MapCamera, maps, vars, Map, Co
         // this.menuCamera = new MenuCamera.MenuCamera();
 
         this.scene = new MapScene.MapScene(maps.debug_3, 0, 500, 500, 0);
+        this.scene = new MenuScene.MenuScene(
+            [new Button.Button(images.startButton, 
+                new Point.Point(520, 200), 
+                function(masterScene) {
+                    masterScene.switchScenes = true;
+                    masterScene.nextScene = function() { return new MapScene.MapScene(maps.debug_3, 0, 500, 500, 0); }
+                }
+            )], 
+            [images.titleScreen])
+        ;
         
         // cut this out or move to scene
         // this.collisionHandler = new CollisionHandler.CollisionHandler();

@@ -1,5 +1,5 @@
-define(["display/Animation", "entities/Entity", "assets/images", "util/Point", "util/goody", "assets/vars"],
-function(Animation, Entity, images, Point, goody, vars)
+define(["display/Animation", "entities/Entity", "util/Point", "util/goody", "assets/vars"],
+function(Animation, Entity, Point, goody, vars)
 {    
     MainChar.prototype = new Entity.Entity();
     MainChar.prototype.constructor = MainChar;
@@ -77,7 +77,7 @@ function(Animation, Entity, images, Point, goody, vars)
         }
         this.move(map, collisionHandler, timeDelta);
         // shaking anim of lazy
-        this.sprite.update();
+        // this.sprite.update();
     }
     
     MainChar.prototype.drawImage = function(ctx, offset)
