@@ -1,53 +1,44 @@
 define(["display/Animation", "entities/Entity", "util/Point", "util/goody", "assets/vars"],
 function(Animation, Entity, Point, goody, vars)
 {    
-    MainChar.prototype = new Entity.Entity();
-    MainChar.prototype.constructor = MainChar;
-
     function MainChar(x, y, z)
     {
         Entity.Entity.apply(this, arguments);
-        this.image = images.BaseTiles;
-        this.velCap = 3;
-        this.friction = .7;
-        this.accel = 1.5;
+        this._accel = 1.5;
+        this._velCap = 3;
+        this._friction = .7;
+        this._floatOffset = 0;        // image offsets as a result of flying and sinking
+        this._targetFloatOffset = 0;  // target image offset at min/max height
+        this._sprite = new Animation.Animation(images.MC, 4, 24, 48);
+
         this.rect.width = 21;
         this.rect.height = 27;
-        this.floatOffset = 0;
-        this.targetFloatOffset = 0;
-        this.sprite = new Animation.Animation(images.MC, 4, 24, 48);
     }
 
     MainChar.prototype.update = function(input, map, collisionHandler, timeDelta)
     {
-        if (input.up || input.down || input.right || input.left) // if moving
+        if (input.up||input.down||input.right||input.left) // if moving
         {
-            if (input.up) // up
-            {   
+            // TODO = Better orientation based on dx and dy
+            if (input.up) {   
                 this.velocity.y -= this.accel;
-                this.sprite.orient("U");
+                this._sprite.orient("U");
             }
-            if (input.right) // right
-            {
+            if (input.right) {
                 this.velocity.x += this.accel;
-                this.sprite.orient("R");
+                this._sprite.orient("R");
             }
-            if (input.down) //down
-            {
+            if (input.down) {
                 this.velocity.y += this.accel;
-                this.sprite.orient("D");
+                this._sprite.orient("D");
             }
-            if (input.left) // left
-            {
+            if (input.left) {
                 this.velocity.x -= this.accel;
-                this.sprite.orient("L");
+                this._sprite.orient("L");
             }        
-            //this.velocity = this.velocity.add(this.acceleration);
-            if (this.velocity.length() > this.velCap)
-            {
+            if (this.velocity.length() > this.velCap) {
                 this.velocity.setLength(this.velCap);
             }; 
-            // should going in the opposite direction should be more efficient than stopping
         }
         else
         {
@@ -77,12 +68,11 @@ function(Animation, Entity, Point, goody, vars)
         }
         this.move(map, collisionHandler, timeDelta);
         // shaking anim of lazy
-        // this.sprite.update();
+        this._sprite.update();
     }
     
-    MainChar.prototype.drawImage = function(ctx, offset)
-    {
-        this.sprite.display(ctx, new Point.Point(this.rect.position.x + offset.x - 3, this.rect.position.y + offset.y - 24 + this.floatOffset))
+    MainChar.prototype.drawImage = function(ctx, offset) {
+        this._sprite.display(ctx, new Point.Point(this.rect.position.x + offset.x - 3, this.rect.position.y + offset.y - 24 + this.floatOffset))
     }
     
     MainChar.prototype.move = function(map, collisionHandler, timeDelta)

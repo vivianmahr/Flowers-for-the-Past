@@ -21,8 +21,8 @@ function(goody, Point)
     Rect.prototype.collideRect = function(r2) { return !(this.getLeft() > r2.getRight() || this.getRight() < r2.getLeft() || this.getTop() > r2.getBottom() || this.getBottom() < r2.getTop()); };
     Rect.prototype.collidePoint = function(p) { return (p.x > this.getLeft() && p.x < this.getRight() && p.y < this.getBottom() && p.y > this.getTop()); };
     
-    Rect.prototype.getCorners = function() // Upper Left, Upper Right, Lower Left, Lower Right
-    { 
+    Rect.prototype.getCorners = function() { 
+    // Upper Left, Upper Right, Lower Left, Lower Right
         return [
             new Point.Point(this.position.x, this.position.y),
             new Point.Point(this.position.x + this.width, this.position.y),
@@ -31,46 +31,42 @@ function(goody, Point)
         ];
     }
     
-    Rect.prototype.draw = function(ctx, offset, color)
-    {
+    Rect.prototype.draw = function(ctx, offset, color) {
         ctx.fillStyle = goody.optional(color, (Math.random().toString(16) + '000000').slice(2, 8));
         ctx.fillRect(this.position.x + offset.x, this.position.y + offset.y, this.width, this.height);
     }
     
-    Rect.prototype.adjacent = function(r2)
-    {
+    Rect.prototype.adjacent = function(r2) {
         return (this.getLeft() == r2.getRight() || this.getRight() == r2.getLeft() || this.getTop() == r2.getBottom() || this.getBottom() == r2.getTop());
     }; 
     
-    Rect.prototype.mergeable = function(r2)
-    {
-        if (this.getLeft() == r2.getRight() || this.getRight() == r2.getLeft()) // left right adjacent
-        {
+    Rect.prototype.mergeable = function(r2) {
+        // this and r2 are left and right of each other
+        if (this.getLeft() == r2.getRight() || this.getRight() == r2.getLeft()) {
             return (this.height == r2.height && this.getBottom() == r2.getBottom());
         }
-        else if (this.getTop() == r2.getBottom() || this.getBottom() == r2.getTop())
-        {
+        // this and r2 are on top of each other
+        else if (this.getTop() == r2.getBottom() || this.getBottom() == r2.getTop()){
             return (this.width == r2.width && this.getLeft() == r2.getLeft());
         }
         return false;
     } 
     
-    Rect.prototype.merge = function(r2)
-    {
-        if (this.getLeft() == r2.getRight()) // this rect is to the right of r2
-        {
+    Rect.prototype.merge = function(r2) {
+        // this rect is to the right of r2
+        if (this.getLeft() == r2.getRight()) {
             return new Rect(r2.position.x, this.position.y, this.width + r2.width, this.height);
         }
-        else if (this.getRight() == r2.getLeft()) // this rect is to the left of r2 X
-        {   
+        // this rect is to the left of r2 X
+        else if (this.getRight() == r2.getLeft()) {   
             return new Rect(this.position.x, r2.position.y, this.width + r2.width, this.height);
         }
-        else if (this.getTop() == r2.getBottom()) // this rect is below r2
-        {   
+        // this rect is below r2
+        else if (this.getTop() == r2.getBottom()) {   
             return new Rect(this.position.x, r2.position.y, this.width, this.height + r2.height);
         }
-        else if (this.getBottom() == r2.getTop())// this rect is above r2
-        {   
+        // this rect is above r2
+        else if (this.getBottom() == r2.getTop()){   
             return new Rect(this.position.x, this.position.y, this.width, this.height + r2.height);
         }
     }

@@ -10,10 +10,9 @@ function(Point, Button, MenuScene, MapScene, InputHandler, goody, MainChar, MapC
         this.input = new InputHandler.InputHandler(); // up right down left
         this.ctx = this.canvas.getContext('2d');
 
-        this.mapCamera = new MapCamera.MapCamera();
+        // this.mapCamera = new MapCamera.MapCamera(this.ctx);
         // this.menuCamera = new MenuCamera.MenuCamera();
 
-        this.scene = new MapScene.MapScene(maps.debug_3, 0, 500, 500, 0);
         this.scene = new MenuScene.MenuScene(
             [new Button.Button(images.startButton, 
                 new Point.Point(520, 200), 
@@ -24,6 +23,7 @@ function(Point, Button, MenuScene, MapScene, InputHandler, goody, MainChar, MapC
             )], 
             [images.titleScreen])
         ;
+        this.scene = new MapScene.MapScene(this.ctx, maps.debug_3, 0, 500, 500, 0);
         
         // cut this out or move to scene
         // this.collisionHandler = new CollisionHandler.CollisionHandler();
