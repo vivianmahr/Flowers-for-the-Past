@@ -1,4 +1,4 @@
-define(["util/goody"],
+define(["lib/goody"],
 function(goody)
 {    
     function CollisionHandler() {}
@@ -9,14 +9,13 @@ function(goody)
         var result = [];
         for (var i=0; i<4; i++) {
             var tile = map.pixelToTile(points[i]);
-
             if (!goody.inArray(result, tile)) {
                  result.push(tile);
             }
         }
         return result;
     }
-
+    
     return {
         CollisionHandler: CollisionHandler
     };

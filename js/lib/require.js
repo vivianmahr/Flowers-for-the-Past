@@ -155,7 +155,7 @@ var requirejs, require, define;
     }
 
     /**
-     * Constructs an error with a pointer to an URL with more information.
+     * Constructs an error with a Vectorer to an URL with more information.
      * @param {String} id the error ID that maps to an ID on a web page.
      * @param {String} message human readable error.
      * @param {Error} [err] the original error, if there is one.
@@ -353,7 +353,7 @@ var requirejs, require, define;
                 }
             }
 
-            // If the name points to a package's name, use
+            // If the name Vectors to a package's name, use
             // the package main instead.
             pkgMain = getOwn(config.pkgs, name);
 
@@ -1313,7 +1313,7 @@ var requirejs, require, define;
                             config.paths[name] = pkgObj.location;
                         }
 
-                        //Save pointer to main module ID for pkg name.
+                        //Save Vectorer to main module ID for pkg name.
                         //Remove leading dot in main, so main paths are normalized,
                         //and remove any trailing .js, since different package
                         //envs have different conventions: some use a module name,
@@ -1688,7 +1688,7 @@ var requirejs, require, define;
     }
 
     /**
-     * Main entry point.
+     * Main entry Vector.
      *
      * If the only argument to require is a string, then the module that
      * is represented by that string is fetched for the appropriate context.

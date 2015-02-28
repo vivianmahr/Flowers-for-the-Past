@@ -1,13 +1,13 @@
-define(["util/Point"],
-function(Point)
+define(["physics/Vector"],
+function(Vector)
 {    
-    function InputHandler()
-    {
+    function InputHandler() {
+        // up down left right are true while pressed, false when not
         this.up = false;
         this.down = false;
         this.right = false;
         this.left = false;
-        this.mousePosition = new Point.Point();
+        this.mousePosition = new Vector.Vector();
     }
 
     InputHandler.prototype.update = function(event, scene) {

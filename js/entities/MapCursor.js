@@ -1,14 +1,16 @@
-define(["display/Animation", "util/Point"],
-function(Animation, Point)
+define(["display/Animation", "physics/Vector", "lib/goody"],
+function(Animation, Vector, goody)
 {    
-    function MapCursor(i)
-    {
-        this.position = new Point.Point(0,0); 
+    function MapCursor(element) {
+        this.position = new Vector.Vector(0,0); 
         this.sprite = new Animation.Animation(images.dragonfly, 2, 19, 18);
-        this.offset = new Point.Point(5*i,0);
+        this.setElement(element);
+        this.offset = new Vector.Vector(5 * element, 0);
+        this.element = element;
+        this.elementCap = 5;
     };
 
-    MapCursor.prototype.display = function(ctx){
+    MapCursor.prototype.display = function(ctx) {
         this.sprite.display(ctx, this.position);
     }
 
@@ -17,21 +19,16 @@ function(Animation, Point)
         this.sprite.update();
     }
     
-    MapCursor.prototype.setElement = function(i)
-    {
-        this.offset.x = 5*i;
+    MapCursor.prototype.setElement = function(e) {
+        this.element = e;
+        this.sprite.setOffsetY(e * 144);
     };
     
-    MapCursor.prototype.move = function(input)
-    {
+    MapCursor.prototype.move = function(input) {
         var x = input.mousePosition.x;
         var y = input.mousePosition.y;
-        var dx = this.position.x - x;
-        var dy = this.position.y - y;// right and down are negative
-        if (dx < 0) { this.sprite.orient("R"); }
-        if (dx > 0) { this.sprite.orient("L"); }
-        if (dy > 0) { this.sprite.orient("U"); }
-        if (dy < 0) { this.sprite.orient("D"); }
+        var angle = new Vector.Vector(this.position.x - x, this.position.y - y);
+        // Update the sprite... when you decide the sprite... 
         this.position.x = x;
         this.position.y = y;
     };

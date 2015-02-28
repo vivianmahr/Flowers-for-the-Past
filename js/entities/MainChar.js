@@ -1,82 +1,112 @@
-define(["display/Animation", "entities/Entity", "util/Point", "util/goody", "assets/vars"],
-function(Animation, Entity, Point, goody, vars)
+define(["display/Animation", "entities/Entity", "physics/Vector", "lib/goody", "assets/vars"],
+function(Animation, Entity, Vector, goody, vars)
 {    
-    function MainChar(x, y, z)
-    {
+    MainChar.prototype = new Entity.Entity();
+    MainChar.prototype.constructor = MainChar;
+
+    function MainChar(x, y, z) {
         Entity.Entity.apply(this, arguments);
         this._accel = 1.5;
         this._velCap = 3;
         this._friction = .7;
         this._floatOffset = 0;        // image offsets as a result of flying and sinking
         this._targetFloatOffset = 0;  // target image offset at min/max height
-        this._sprite = new Animation.Animation(images.MC, 4, 24, 48);
+        this._sprite = new Animation.Animation(images.MC, 1, 24, 48);
+        this._shadowSprite = new Animation.Animation(images.MCshadow, 1, 20, 8);
 
         this.rect.width = 21;
         this.rect.height = 27;
     }
 
-    MainChar.prototype.update = function(input, map, collisionHandler, timeDelta)
-    {
-        if (input.up||input.down||input.right||input.left) // if moving
-        {
+    MainChar.prototype.setPosition = function(x, y) {
+        this.rect.setLeft(x);
+        this.rect.setTop(y);
+    }
+
+    MainChar.prototype.update = function(input, map, collisionHandler, timeDelta) {
+        // if moving 
+        if (input.up||input.down||input.right||input.left) {
             // TODO = Better orientation based on dx and dy
             if (input.up) {   
-                this.velocity.y -= this.accel;
-                this._sprite.orient("U");
+                this.velocity.y -= this._accel;
             }
             if (input.right) {
-                this.velocity.x += this.accel;
-                this._sprite.orient("R");
+                this.velocity.x += this._accel;
             }
             if (input.down) {
-                this.velocity.y += this.accel;
-                this._sprite.orient("D");
+                this.velocity.y += this._accel;
             }
             if (input.left) {
-                this.velocity.x -= this.accel;
-                this._sprite.orient("L");
+                this.velocity.x -= this._accel;
             }        
-            if (this.velocity.length() > this.velCap) {
-                this.velocity.setLength(this.velCap);
+            if (this.velocity.length() > this._velCap) {
+                this.velocity.setLength(this._velCap);
             }; 
         }
-        else
-        {
-            this.velocity.mult(this.friction);
+        else {
+            this.velocity.mult(this._friction);
         }
-        if (this.floatOffset !== this.targetFloatOffset && Math.abs(this.floatOffset - this.targetFloatOffset) < 0.5) {
-            // ^ If it's close enough to being exact or the same
-            this.floatOffset = this.targetFloatOffset;
-            if (this.movementAttributes.temperature != 2) // falling to ground level I'm not sure if this should be not 0
-            {
-                var currentTiles = collisionHandler.collidingTiles(map, this.rect);
-                var currentHeights = [];
-                for (var i=0; i<currentTiles.length; i++) {
-                    var tileHeight = map.getHeight(currentTiles[i]);
-                    if (!goody.inArray(currentHeights, tileHeight)) {
-                        currentHeights.push(tileHeight);
-                    }
-                }   
-                this.movementAttributes.airborne = false;
-                this.movementAttributes.height = Math.max.apply(Math, currentHeights); // highest height you're sitting on
+        var angle = 180 * this.velocity.getDirection() / Math.PI;
+        if (angle < 0) {angle += 360;}
+        if (angle > 22.5 && angle < 122.5) {
+            this._sprite.orient("D");
+        }
+        else if (angle > 202.5 && angle < 292.5) {
+            this._sprite.orient("U");
+        }
+        else if (angle > 122.5 && angle < 202.5) {
+            this._sprite.orient("L");;
+        }
+        else {
+            this._sprite.orient("R");
+        }
+        this._handleFloatOffset(map, collisionHandler);
+        this._move(map, collisionHandler, timeDelta);
+        this._sprite.update();
+    }
 
+    MainChar.prototype._handleFloatOffset = function(map, collisionHandler) {
+        // If the float offset isn't exactly there but it's close enough
+        if (this._floatOffset !== this._targetFloatOffset) {
+            if (Math.abs(this._floatOffset - this._targetFloatOffset) < 0.5) {
+                // MC is falling down, have to set height
+                // TODO - What happens if you're floating and you go to a tile that's
+                // a lot lower than you...? same for sinking
+                var currentTiles = collisionHandler.collidingTiles(map, this.rect);
+                var maxHeight = -1;
+                for (var i = 0; i < currentTiles.length; i++) {
+                    var tileHeight = map.getHeight(currentTiles[i]);
+                    maxHeight = tileHeight > maxHeight ? tileHeight : maxHeight; 
+                }
+                // MC is climbing up, 
+                if (this.movementAttributes.temperature === 1) {
+                    this.movementAttributes.sinking = false;
+                    this.movementAttributes.airborne = false;
+                }
+                else if (this._floatOffset < this._targetFloatOffset) {
+                    this.movementAttributes.airborne = false;
+                }
+                // MC is sinking
+                else {
+                    this.movementAttributes.sinking = false;
+                }
+                // On a temp tile, had to be going up
+                this.movementAttributes.height = tileHeight;                     
+                this._floatOffset = this._targetFloatOffset;
+            }
+            else {
+                this._floatOffset += (this._targetFloatOffset - this._floatOffset)/2;
             }
         }
-        else 
-        {
-            this.floatOffset += (this.targetFloatOffset - this.floatOffset)/2;
-        }
-        this.move(map, collisionHandler, timeDelta);
-        // shaking anim of lazy
-        this._sprite.update();
     }
     
     MainChar.prototype.drawImage = function(ctx, offset) {
-        this._sprite.display(ctx, new Point.Point(this.rect.position.x + offset.x - 3, this.rect.position.y + offset.y - 24 + this.floatOffset))
+        this._shadowSprite.display(ctx, new Vector.Vector(this.rect.position.x + offset.x - 3, this.rect.position.y + offset.y + 18))
+        this._sprite.display(ctx, new Vector.Vector(this.rect.position.x + offset.x - 3, this.rect.position.y + offset.y - 24 + this._floatOffset))
+        // this.rect.draw(ctx, offset);
     }
     
-    MainChar.prototype.move = function(map, collisionHandler, timeDelta)
-    {
+    MainChar.prototype._move = function(map, collisionHandler, timeDelta) {
         this.moveAxis("x", this.velocity.x * timeDelta/9, collisionHandler, map);
         this.moveAxis("y", this.velocity.y * timeDelta/9, collisionHandler, map);
     }
@@ -84,49 +114,42 @@ function(Animation, Entity, Point, goody, vars)
     MainChar.prototype.moveAxis = function(axis, distance, collisionHandler, map) {
         var isXaxis = axis === "x";
         var currentTiles = collisionHandler.collidingTiles(map, this.rect);
-
+        // Move forward the right position area, then look at the tiles the rect is on
+        // and see if there are any new tile effects to be applied
         if (isXaxis) { 
-            this.rect.position.x = goody.cap(this.rect.position.x+distance, 0, map.pixelWidth-this.rect.width-1); 
+            this.rect.position.x = goody.cap(this.rect.position.x + distance, 0, map.pixelWidth - this.rect.width - 1); 
         } 
         else { 
-            this.rect.position.y = goody.cap(this.rect.position.y+distance, 0, map.pixelHeight-this.rect.height-1); 
+            this.rect.position.y = goody.cap(this.rect.position.y + distance, 0, map.pixelHeight - this.rect.height - 1); 
         }
-
         var newTiles = collisionHandler.collidingTiles(map, this.rect);
-
+        // See if you're on any new tiles
         for (var i = 0; i < newTiles.length; i++) {
-            if (!goody.inArray(currentTiles, newTiles[i])) { // There's a new tile effect to be applied
+            // If the one of the new tiles was just stepped onto
+            if (!goody.inArray(currentTiles, newTiles[i])) { 
                 var newTile = newTiles[i];
                 // Height processing is first - if MC can't reach the tile, don't bother checking for effects
                 var heightDifference = map.getHeight(newTile) - this.movementAttributes.height;
-                if (this.movementAttributes.airborne && (heightDifference === 2 || heightDifference === 3)) {
-                    this.applyTempChange(map, newTile);
-                    continue;
+                console.log(map.getHeight(newTile), this.movementAttributes.height);
+                var sink = this.movementAttributes.sinking;
+                var fly = this.movementAttributes.airborne;
+                // Do nothing if you're walking on flat ground or a slight incline
+                // Do nothing if you're not airborne or the height difference is nothing doable
+                if ((map.isJump(newTile) || (Math.abs(heightDifference) > 1)) && heightDifference <= 2) {
+                    if (sink && heightDifference > -3 && heightDifference <= 0 ) {
+                        this.applyHumChange(map, newTile);
+                        this.applyTempChange(map, newTile);
+                    }
+                    else if (fly && heightDifference < 3 && heightDifference > 0) {
+                        this.applyHumChange(map, newTile);
+                        this.applyTempChange(map, newTile);
+                    }
+                    else {
+                        this.moveBack(isXaxis, distance, newTile, map);
+                    }
                 }
-                if (map.isJump(newTile) && !this.movementAttributes.airborne){
-                    this.moveBack(isXaxis, distance, newTile, map);
-                    continue;
-                }
-                if (map.getHeight(newTile) - this.movementAttributes.height >= 2 ) {
-                    this.moveBack(isXaxis, distance, newTile, map);
-                    continue;
-                }
-                if (!this.movementAttributes.airborne && (map.getHeight(newTile) - this.movementAttributes.height <= -2) ) {
-                    this.moveBack(isXaxis, distance, newTile, map);
-                    continue;
-                }
-                // Elememtal effect needs to be applied and possibly height
-                // unsure to growth effects, but they will probably be applied first or last
-                // var growthEffect = map.getElement(newTile, "Growth") != this.movementAttributes.growth;
-                this.movementAttributes.height = map.getHeight(newTile);
-                var humEffect = map.getElement(newTile, "Humidity") != this.movementAttributes.humidity;
-                var tempEffect = map.getElement(newTile, "Temperature") != this.movementAttributes.temperature;
-
-                // if (growthEffect) {console.log("growth");}
-                if (humEffect) {
+                else {
                     this.applyHumChange(map, newTile);
-                }
-                if (tempEffect) {
                     this.applyTempChange(map, newTile);
                 }
             }
@@ -136,22 +159,19 @@ function(Animation, Entity, Point, goody, vars)
     MainChar.prototype.applyTempChange = function(map, newTile) {
         var oldTemp = this.movementAttributes.temperature;
         var newTemp = map.getElement(newTile, "Temperature");
-        this.movementAttributes.temperature = newTemp;
-        if (newTemp != oldTemp)
-        {
+        if (newTemp != oldTemp) {
+            this.movementAttributes.temperature = newTemp;
             if (newTemp === 2) { // heat
                 this.movementAttributes.airborne = true;
-                this.movementAttributes.height = map.getHeight(newTile) + 3;
-                this.targetFloatOffset = -20;
+                this._targetFloatOffset = -20;
             } 
-            else if (newTemp === 1) //neutral
-            {
-                this.targetFloatOffset = 0;
+            else if (newTemp === 1) { // neutral
+                this._targetFloatOffset = 0;
             }
-            else {
+            else { // cold
                 this.movementAttributes.sinking = true;
-                this.targetFloatOffset = 20;
-            }        
+                this._targetFloatOffset = 20;
+            }
         }
     }
 
@@ -163,20 +183,20 @@ function(Animation, Entity, Point, goody, vars)
      }
 
     MainChar.prototype.moveBack = function(isXaxis, distance, newTile, map){
-        if (isXaxis && distance > 0) // moving right, hit left side of wall
-        {
+        // moving right, hit left side of wall
+        if (isXaxis && distance > 0) {
             this.rect.setRight(map.tileToPixel(newTile).x-1);
         }
-        else if (isXaxis && distance < 0) // moving left, hit right side of wall
-        {
+        // moving left, hit right side of wall
+        else if (isXaxis && distance < 0) {
             this.rect.setLeft(map.tileToPixel(newTile).x+vars.tileDimension+1);
         }
-        else if (distance > 0) // moving down, hit top side of wall
-        {
+        // moving down, hit top side of wall
+        else if (distance > 0) {
             this.rect.setBottom(map.tileToPixel(newTile).y-1);
         }
-        else // moving up, hit bottom side of wall
-        {
+        // moving up, hit bottom side of wall
+        else {
             this.rect.setTop(map.tileToPixel(newTile).y+vars.tileDimension+1);
         } 
     }

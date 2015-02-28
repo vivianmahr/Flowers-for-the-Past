@@ -34,11 +34,11 @@ function(Scene)
                 0,                                                          //xPosCanvas    
                 0,                                                          //yPosCanvas    
                 toRender.width,                                             //imageWidth on Canvas
-                toRender.height                                            //imageHeight on Canvas                
+                toRender.height                                             //imageHeight on Canvas                
             );
         }
         for (var i = 0; i < this.buttons.length; i++) {
-            this.buttons[i].display(ctx); // camear? think this out
+            this.buttons[i].display(ctx); 
         }
     }
 

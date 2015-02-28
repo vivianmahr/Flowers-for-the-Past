@@ -13,6 +13,18 @@ function()
         "LU" : 7,
     }
 
+    var singleElements = {
+        "111": 1,
+        // Hum
+        "211": 1,
+        "011": 1,
+        // Temp
+        "121": 1,
+        "101": 1,
+        // Growth
+        "112": 1,
+        "110": 1,
+    }
     // For element offsets, done on the X-axis of the image
     // TODO: Rearrange so that single-element numbers are at the beginning
     // for cursor and seed spores and MC variations
@@ -53,7 +65,8 @@ function()
         displayHeight: 528,
         displayWidth: 748,
         tileDimension: 24,
-        propertiesOffset: 4,
+        // ...I forgot what this is but it varies from tilesheet to tilesheet, old one was +4
+        propertiesOffset: -202,
         tileSetHeight: 12,
         tileSetWidth:12,
         mapLength: 144,

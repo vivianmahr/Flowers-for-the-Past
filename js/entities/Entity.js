@@ -1,8 +1,8 @@
-define(["util/goody", "util/Point", "util/Rect"],
-function(goody, Point, Rect)
+define(["lib/goody", "physics/Vector", "physics/Rect"],
+function(goody, Vector, Rect)
 {    
     function Entity(x, y, z) {       
-        this.velocity = new Point.Point(0, 0); 
+        this.velocity = new Vector.Vector(0, 0); 
         this.rect = new Rect.Rect(x, y, 1, 1);
         this.movementAttributes = {
             "height": goody.optional(z, 1),

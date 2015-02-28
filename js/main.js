@@ -37,7 +37,6 @@ function start() {
             }
             main.draw();
         }
-
         start();
     });
 }

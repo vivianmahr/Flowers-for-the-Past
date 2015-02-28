@@ -1,3 +1,0 @@
-../rules/0 0 0/rules_000.txt
-../rules/0 1 0/rules_010.txt
-../rules/Processing/rules_processing.txt
