@@ -101,46 +101,67 @@ function(goody, Vector, vars)
     Map.prototype.applyElement = function(pixelVector, element) {
         var zone = this.findZonebyPixel(pixelVector);
         var elementType = element < 2 ? "Humidity" : element < 4 ? "Growth" : "Temperature";
-        var increment = element % 2 ? 1 : -1;
+        var increment = element % 2 ? 1 : -1; // Whether the category changes by + or - 1
         var cap = increment == 1 ? 2 : 0;
-        // For early stages only
+        // For early stages only, tiles should only have one element applied to them at a time
         var negate = ["Humidity", "Growth", "Temperature"];
         negate.splice(negate.indexOf(elementType), 1);
-
         for (var i = 0; i < 4; i++) {
             var tile = zone[i];
-            this.elementMap[elementType][tile] = this.elementMap[elementType][tile] + increment;
+            this.elementMap[elementType][tile] = goody.cap(this.elementMap[elementType][tile] + increment, 0, 2);
             // Temp...maybe.
-            this.elementMap[negate[0]][tile] = 0;
-            this.elementMap[negate[1]][tile] = 0;
+            this.elementMap[negate[0]][tile] = 1;
+            this.elementMap[negate[1]][tile] = 1;
         }
         if (elementType == "Growth") {
             // Add objects
         }
-        this.updateZone(zone, element, this.elementMap[elementType][zone[1]]);
+        this.updateZone(zone, elementType, element);
     }
     
-    Map.prototype.updateZone = function(zone, appliedElement, currentElement) {
+    Map.prototype.updateZone = function(zone, elementType, appliedElement) {
         var newEF0 = [0, 0, 0, 0];
         var newEF1 = [0, 0, 0, 0];
         var newEF2 = [0, 0, 0, 0];
-        if (currentElement !== 1) {
+        for (var i = 0; i < 4; i++) {
+            var tile = zone[i];
+            newEF0[i] = this.effectMap[0][tile];
+            newEF1[i] = this.effectMap[1][tile];
+            newEF2[i] = this.effectMap[2][tile];
+        }
+        // this REALLY should work for any tile including ledges, temp fix 
+        //         "data":[263, 264, 311, 312, 327, 328, 335, 336, 343, 344, 359, 360, 407, 408, 
+        //                 479, 480, 527, 528, 543, 544, 551, 552, 559, 560, 575, 576, 623, 624],
+        //                 Dry       Cold      Rot       Neutr     Growth    Hot       Wet
+        console.log(this.elementMap[elementType][zone[0]], elementType, appliedElement);
+        if (this.elementMap[elementType][zone[0]] === 1) { // pure neutral, dirt
+            newEF0 = [0, 0, 0, 0];
+        }
+        else {
             switch(appliedElement) {
                 case 0: // Dry
+                    newEF0 = [263, 264, 479, 480];
                     break;
                 case 1: // Wet
+                    newEF0 = [407, 408, 623, 624];
                     break;
                 case 2: // Rot
+                    newEF0 = [327, 328, 543, 544];
                     break;
                 case 3: // Life
+                    newEF0 = [343, 344, 559, 560];
                     break;
                 case 4: // Cold
+                    newEF0 = [311, 312, 527, 528];
                     break;
                 case 5: // Hot
                     newEF0 = [359, 360, 575, 576];
                     break;
-            }
+            }   
         }
+
+
+
         for (var i = 0; i < 4; i++) {
             var tile = zone[i];
             this.effectMap[0][tile] = newEF0[i];
