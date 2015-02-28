@@ -22,7 +22,7 @@ function(Vector, Button, MenuScene, MapScene, InputHandler, goody, MainChar, Map
         ;
         */
         // this.scene = new MapScene.MapScene(this.ctx, maps.debug_5, 0, 50, 80, 0, false);
-        this.scene = new MapScene.MapScene(this.ctx, maps.test_intro_0, 0, 50, 80, 7, true);
+        this.scene = new MapScene.MapScene(this.ctx, maps.intro_0, 0, 50, 80, 7, true);
         this.resizeCanvas();  
     };
     

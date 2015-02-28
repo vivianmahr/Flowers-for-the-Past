@@ -78,6 +78,7 @@ function(Animation, Entity, Vector, goody, vars)
                     var tileHeight = map.getHeight(currentTiles[i]);
                     maxHeight = tileHeight > maxHeight ? tileHeight : maxHeight; 
                 }
+
                 // MC is climbing up, 
                 if (this.movementAttributes.temperature === 1) {
                     this.movementAttributes.sinking = false;
@@ -91,7 +92,7 @@ function(Animation, Entity, Vector, goody, vars)
                     this.movementAttributes.sinking = false;
                 }
                 // On a temp tile, had to be going up
-                this.movementAttributes.height = tileHeight;                     
+                this.movementAttributes.height = tileHeight;          
                 this._floatOffset = this._targetFloatOffset;
             }
             else {
@@ -130,7 +131,6 @@ function(Animation, Entity, Vector, goody, vars)
                 var newTile = newTiles[i];
                 // Height processing is first - if MC can't reach the tile, don't bother checking for effects
                 var heightDifference = map.getHeight(newTile) - this.movementAttributes.height;
-                console.log(map.getHeight(newTile), this.movementAttributes.height);
                 var sink = this.movementAttributes.sinking;
                 var fly = this.movementAttributes.airborne;
                 // Do nothing if you're walking on flat ground or a slight incline

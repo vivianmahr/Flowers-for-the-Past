@@ -1170,7 +1170,7 @@ intro_0 = { "height":36,
          "name":"JumpFlag",
          "opacity":1,
          "type":"tilelayer",
-         "visible":true,
+         "visible":false,
          "width":40,
          "x":0,
          "y":0
@@ -1217,7 +1217,7 @@ intro_0 = { "height":36,
                  "name":"",
                  "properties":
                     {
-
+                     "height":"7"
                     },
                  "type":"spawn",
                  "visible":true,

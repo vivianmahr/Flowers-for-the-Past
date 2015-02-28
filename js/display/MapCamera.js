@@ -120,11 +120,13 @@ function(Vector, goody, vars)
             image = images.Tileset;
         }
         else {
-            image = images.Tileset; // switch to other images
+            image = images.Tileset; // switch to other images, they don't exist yet
         } 
 
         var dim = vars.tileDimension;
         var mapVector = map.tileToPixel(i);
+        // offset for the number and processing tiles
+        tile = tile - 13; 
         var xpos = (tile % (image.width / dim) - 1) * dim;            
         var ypos = Math.floor(tile / (image.width / dim)) * dim; 
         
@@ -135,7 +137,7 @@ function(Vector, goody, vars)
             dim,                                                        //imageWidth on Source
             dim,                                                        //imageHeight on Source
             mapVector.x,                                                //xPosCanvas    
-            mapVector.y,                                                 //yPosCanvas    
+            mapVector.y,                                                //yPosCanvas    
             dim,                                                        //imageWidth on Canvas
             dim                                                         //imageHeight on Canvas                
         );

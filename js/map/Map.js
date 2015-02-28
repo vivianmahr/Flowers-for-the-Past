@@ -38,7 +38,7 @@ function(goody, Vector, vars)
             }
             // Height map
             else if (name === "Height") {
-                this.heightMap = layers[i].data.map( function(x) {return x-1; });
+                this.heightMap = layers[i].data;
             }
             // Unused atm
             else if (name === "Objects") {
