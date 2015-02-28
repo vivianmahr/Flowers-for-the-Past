@@ -116,52 +116,28 @@ function(goody, Vector, vars)
         if (elementType == "Growth") {
             // Add objects
         }
-        this.updateZone(zone, elementType, element);
+        this.updateZone(zone, elementType, increment);
     }
     
-    Map.prototype.updateZone = function(zone, elementType, appliedElement) {
+    Map.prototype.updateZone = function(zone, elementType, increment) {
         var newEF0 = [0, 0, 0, 0];
         var newEF1 = [0, 0, 0, 0];
         var newEF2 = [0, 0, 0, 0];
+        var BG0Images = [0, 0, 0, 0];
         for (var i = 0; i < 4; i++) {
             var tile = zone[i];
             newEF0[i] = this.effectMap[0][tile];
             newEF1[i] = this.effectMap[1][tile];
             newEF2[i] = this.effectMap[2][tile];
+            BG0Images[i] = this.imageMap[0][tile];
         }
-        // this REALLY should work for any tile including ledges, temp fix 
-        //         "data":[263, 264, 311, 312, 327, 328, 335, 336, 343, 344, 359, 360, 407, 408, 
-        //                 479, 480, 527, 528, 543, 544, 551, 552, 559, 560, 575, 576, 623, 624],
-        //                 Dry       Cold      Rot       Neutr     Growth    Hot       Wet
-        console.log(this.elementMap[elementType][zone[0]], elementType, appliedElement);
+        console.log(this.elementMap[elementType][zone[0]], elementType, increment)
         if (this.elementMap[elementType][zone[0]] === 1) { // pure neutral, dirt
             newEF0 = [0, 0, 0, 0];
         }
         else {
-            switch(appliedElement) {
-                case 0: // Dry
-                    newEF0 = [263, 264, 479, 480];
-                    break;
-                case 1: // Wet
-                    newEF0 = [407, 408, 623, 624];
-                    break;
-                case 2: // Rot
-                    newEF0 = [327, 328, 543, 544];
-                    break;
-                case 3: // Life
-                    newEF0 = [343, 344, 559, 560];
-                    break;
-                case 4: // Cold
-                    newEF0 = [311, 312, 527, 528];
-                    break;
-                case 5: // Hot
-                    newEF0 = [359, 360, 575, 576];
-                    break;
-            }   
+            newEF0 = BG0Images.map( function(x) { return x + increment * vars.elementalTileOffsets[elementType]; } );
         }
-
-
-
         for (var i = 0; i < 4; i++) {
             var tile = zone[i];
             this.effectMap[0][tile] = newEF0[i];
