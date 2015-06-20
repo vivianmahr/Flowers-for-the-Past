@@ -2,6 +2,7 @@ define(["lib/goody", "physics/Vector", "assets/vars"],
 function(goody, Vector, vars)
 {    
     function Map(json) {
+
         this.height = json.height;
         this.width = json.width;
         this.pixelWidth = this.width * vars.tileDimension;
@@ -57,6 +58,7 @@ function(goody, Vector, vars)
                 this.elementMap[name] = layers[i].data.map( function(x) { return x-1; } );
             }
         }
+        // console.log(this.elementMap);s
     }
 
     Map.prototype.indexUp = function(n) { return n - this.width; };
@@ -98,11 +100,15 @@ function(goody, Vector, vars)
         }
     }
 
+    Map.prototype.getZoneElement = function(zone) {
+        return this.getTileElement(zone[0]);
+    }
+
     Map.prototype.applyElement = function(pixelVector, element) {
         var zone = this.findZonebyPixel(pixelVector);
         var elementType = element < 2 ? "Humidity" : element < 4 ? "Growth" : "Temperature";
         var increment = element % 2 ? 1 : -1; // Whether the category changes by + or - 1
-        var cap = increment == 1 ? 2 : 0;
+        var cap = increment === 1 ? 2 : 0;
         // For early stages only, tiles should only have one element applied to them at a time
         var negate = ["Humidity", "Growth", "Temperature"];
         negate.splice(negate.indexOf(elementType), 1);
@@ -116,10 +122,10 @@ function(goody, Vector, vars)
         if (elementType == "Growth") {
             // Add objects
         }
-        this.updateZone(zone, elementType, increment);
+        this.updateZone(zone);
     }
     
-    Map.prototype.updateZone = function(zone, elementType, increment) {
+    Map.prototype.updateZone = function(zone) {
         var newEF0 = [0, 0, 0, 0];
         var newEF1 = [0, 0, 0, 0];
         var newEF2 = [0, 0, 0, 0];
@@ -131,12 +137,75 @@ function(goody, Vector, vars)
             newEF2[i] = this.effectMap[2][tile];
             BG0Images[i] = this.imageMap[0][tile];
         }
-        console.log(this.elementMap[elementType][zone[0]], elementType, increment)
-        if (this.elementMap[elementType][zone[0]] === 1) { // pure neutral, dirt
-            newEF0 = [0, 0, 0, 0];
+        var tileElement = this.getZoneElement(zone);
+        if (goody.arrayEquals(tileElement, [1, 1, 1])) { // pure neutral, dirt
+            newEF0 = [0, 0, 0, 0]; // Invisible
         }
         else {
-            newEF0 = BG0Images.map( function(x) { return x + increment * vars.elementalTileOffsets[elementType]; } );
+            var adjacentTilesDifferentElement = [
+                !goody.arrayEquals(this.getTileElement(this.indexUp(zone[0])), tileElement), 
+                !goody.arrayEquals(this.getTileElement(this.indexRight(this.indexUp(zone[1]))), tileElement), 
+                !goody.arrayEquals(this.getTileElement(this.indexRight(zone[3])), tileElement), 
+                !goody.arrayEquals(this.getTileElement(this.indexRight(this.indexDown(zone[3]))), tileElement), 
+                !goody.arrayEquals(this.getTileElement(this.indexDown(zone[3])), tileElement), 
+                !goody.arrayEquals(this.getTileElement(this.indexLeft(this.indexDown(zone[2]))), tileElement), 
+                !goody.arrayEquals(this.getTileElement(this.indexLeft(zone[0])), tileElement), 
+                !goody.arrayEquals(this.getTileElement(this.indexLeft(this.indexUp(zone[0]))), tileElement), 
+            ]; // Up UpRight Right DownRight Down DownLeft Left UpLeft 
+            console.log(zone);
+            console.log(adjacentTilesDifferentElement);
+            console.log("------")
+            var elementType;
+            var increment;
+            if (tileElement[0] !== 1) {
+                elementType = "Growth";
+                increment = tileElement[0];
+            }
+            else if (tileElement[1] !== 1) {
+                elementType = "Humidity";
+                increment = tileElement[1];
+            }
+            else {
+                elementType = "Temperature";
+                increment = tileElement[2];
+            }
+            newEF0 = BG0Images.map( function(x) { return x + ((increment-1) * vars.elementalTileOffsets[elementType]); } );
+
+            if (adjacentTilesDifferentElement[0]) { // up is different
+                newEF0[0] -= vars.tileSetTileWidth;
+                newEF0[1] -= vars.tileSetTileWidth;
+            }
+            else {
+                this.updateNeighboringTile(this.findZonebyIndex(this.indexUp(zone[0])));
+            }
+
+
+            if (adjacentTilesDifferentElement[2]) { // right is different
+                newEF0[1] += 1;
+                newEF0[3] += 1;
+            }
+            else {
+                this.updateNeighboringTile(this.findZonebyIndex(this.indexRight(zone[1])));
+            }
+
+            // Infinite recursion for down and right
+            if (adjacentTilesDifferentElement[4]) { // down is different
+                newEF0[2] += vars.tileSetTileWidth;
+                newEF0[3] += vars.tileSetTileWidth;
+            }
+            else {
+                this.updateNeighboringTile(this.findZonebyIndex(this.indexDown(zone[2])));
+            }
+
+
+            if (adjacentTilesDifferentElement[6]) { // left is different
+                newEF0[0] -= 1;
+                newEF0[2] -= 1;
+            }
+            else {
+                this.updateNeighboringTile(this.findZonebyIndex(this.indexLeft(zone[0])));
+            }
+            
         }
         for (var i = 0; i < 4; i++) {
             var tile = zone[i];
@@ -146,6 +215,72 @@ function(goody, Vector, vars)
         }
     }
 
+    Map.prototype.updateNeighboringTile = function(zone) {
+        var newEF0 = [0, 0, 0, 0];
+        var newEF1 = [0, 0, 0, 0];
+        var newEF2 = [0, 0, 0, 0];
+        var BG0Images = [0, 0, 0, 0];
+        for (var i = 0; i < 4; i++) {
+            var tile = zone[i];
+            newEF0[i] = this.effectMap[0][tile];
+            newEF1[i] = this.effectMap[1][tile];
+            newEF2[i] = this.effectMap[2][tile];
+            BG0Images[i] = this.imageMap[0][tile];
+        }
+        var tileElement = this.getZoneElement(zone);
+        
+        var adjacentTilesDifferentElement = [
+            !goody.arrayEquals(this.getTileElement(this.indexUp(zone[0])), tileElement), 
+            !goody.arrayEquals(this.getTileElement(this.indexRight(this.indexUp(zone[1]))), tileElement), 
+            !goody.arrayEquals(this.getTileElement(this.indexRight(zone[3])), tileElement), 
+            !goody.arrayEquals(this.getTileElement(this.indexRight(this.indexDown(zone[3]))), tileElement), 
+            !goody.arrayEquals(this.getTileElement(this.indexDown(zone[3])), tileElement), 
+            !goody.arrayEquals(this.getTileElement(this.indexLeft(this.indexDown(zone[2]))), tileElement), 
+            !goody.arrayEquals(this.getTileElement(this.indexLeft(zone[0])), tileElement), 
+            !goody.arrayEquals(this.getTileElement(this.indexLeft(this.indexUp(zone[0]))), tileElement), 
+        ]; // Up UpRight Right DownRight Down DownLeft Left UpLeft 
+        var elementType;
+        var increment;
+        console.log("neighboring");
+        if (tileElement[0] !== 1) {
+            elementType = "Growth";
+            increment = tileElement[0];
+        }
+        else if (tileElement[1] !== 1) {
+            elementType = "Humidity";
+            increment = tileElement[1];
+        }
+        else {
+            elementType = "Temperature";
+            increment = tileElement[2];
+        }
+        newEF0 = BG0Images.map( function(x) { return x + ((increment-1) * vars.elementalTileOffsets[elementType]); } );
+
+        if (adjacentTilesDifferentElement[0]) { // up is different
+            newEF0[0] -= vars.tileSetTileWidth;
+            newEF0[1] -= vars.tileSetTileWidth;
+        }
+        if (adjacentTilesDifferentElement[2]) { // right is different
+            newEF0[1] += 1;
+            newEF0[3] += 1;
+        }
+        if (adjacentTilesDifferentElement[4]) { // down is different
+            newEF0[2] += vars.tileSetTileWidth;
+            newEF0[3] += vars.tileSetTileWidth;
+        }
+        if (adjacentTilesDifferentElement[6]) { // left is different
+            newEF0[0] -= 1;
+            newEF0[2] -= 1;
+        }
+        for (var i = 0; i < 4; i++) {
+            var tile = zone[i];
+            this.effectMap[0][tile] = newEF0[i];
+            this.effectMap[1][tile] = newEF1[i];
+            this.effectMap[2][tile] = newEF2[i];
+        }
+
+    }
+
     Map.prototype.findZonebyPixel = function(pixelVector) {
         return this.findZonebyIndex(this.pixelToTile(pixelVector));
     }
@@ -153,7 +288,13 @@ function(goody, Vector, vars)
     Map.prototype.getHeight = function(tileIndex) {
         return this.heightMap[tileIndex];
     }
-
+    Map.prototype.getTileElement = function(tileIndex) {
+        var result  = [];
+        result.push(this.elementMap["Growth"][tileIndex]);
+        result.push(this.elementMap["Humidity"][tileIndex]);
+        result.push(this.elementMap["Temperature"][tileIndex]);
+        return result;
+    }
     Map.prototype.getElement = function(tileIndex, element) {
         return this.elementMap[element][tileIndex];
     }

@@ -48,15 +48,18 @@ function(Vector, goody, vars)
     }
 
     MapCamera.prototype.reloadMap = function(map) {
+        // parallax, parallax, bg0, ef0, bg1, ef1, bg2, ef2
+        // 0         1         2    3    4    5    6    7
         var bufferLength = this._buffer.length;
         for (var i = (map.parallax ? 2 : 0); i < bufferLength; i += 2) {
-            var layerNumber = Math.floor(i/2) + (map.parallax ? 2 : 1);
+            var layerNumber = i + 1;
             var layer = map.effectMap[i/2 - (map.parallax ? 1 : 0)];
+                // console.log(i/2 - (map.parallax ? 1 : 0), layerNumber);
             var ctx = this._buffer[layerNumber].getContext("2d");
-            ctx.clearRect (0, 0, vars.displayHeight, vars.displayWidth);
-            for (var n = 0; n < this._mapLength; n++) {
-                this.renderTile(n, layer[n], map, ctx);
-            }
+            ctx.clearRect (0, 0, map.pixelHeight, map.pixelWidth);
+           for (var n = 0; n < this._mapLength; n++) {
+               this.renderTile(n, layer[n], map, ctx);
+           }
         }
     }
 

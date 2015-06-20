@@ -1,0 +1,4 @@
+Event images (marker)
+Dry and Wet don't seem to be affecting speed anymore
+Scene transitions 
+IF there's an EF in a tile layer, don't render the BG in that tile layer + Make reloading the tiles more efficient

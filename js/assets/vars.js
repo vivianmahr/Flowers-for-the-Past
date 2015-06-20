@@ -33,7 +33,7 @@ function()
         fps: 30,
         interval: 1000/fps,
         directions: directions,
-        elementalTileOffsets: elementalTileOffsets
-
+        elementalTileOffsets: elementalTileOffsets,
+        tileSetTileWidth: 216
     }
 });

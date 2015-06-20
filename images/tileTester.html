@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+    <!-- 
+        Quick testing file for 
+    -->
+    <style>
+        .mc {
+            height: 48px;
+            width: 24px;
+            position: absolute;
+            z-index: 10;
+        }
+        .mc::after {
+            position: relative;
+            top: 36px;
+            content: url("MCshadow.png");
+            z-index: -3;
+        }
+        #mc1 {
+            background: url("MC.png");
+            left: 394px;
+            top: 502px;
+        }
+        #mc1::after {
+            left: 3px;
+        }
+        #mc2 {
+            background: url("MC.png") 0 -96px;
+            left: 123px;
+            top: 301px;
+        }
+        #mc3 {
+            background: url("MC.png") 0 -192px;
+            left: 806px;
+            top: 302px;
+        }        
+        #mc3::after {
+            left: 3px;
+        }
+        #mc4 {
+            background: url("MC.png") 0 -288px;
+            left: 394px;
+            top: 201px;
+        }
+        html, body, .bg {
+            height: 600px;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+        .bg {
+            position: absolute;
+            height: 100%;
+            top: 0;
+            left: 0;
+            width: 100%;
+        }
+        .bg-div {
+            width: 48px;
+            height: 100%;
+            background: url("testingTile.png") 48px 0;
+            float: left;
+        }
+    </style>
+    <body>
+        <div class="bg">
+            <div class="bg-div"></div>
+            <div class="bg-div"></div>
+            <div class="bg-div"></div>
+            <div class="bg-div"></div>
+            <div class="bg-div"></div>
+            <div class="bg-div"></div>
+            <div class="bg-div"></div>
+            <div class="bg-div"></div>
+            <div class="bg-div"></div>
+            <div class="bg-div"></div>
+            <div class="bg-div"></div>
+            <div class="bg-div"></div>
+            <div class="bg-div"></div>
+            <div class="bg-div"></div>
+            <div class="bg-div"></div>
+            <div class="bg-div"></div>
+            <div class="bg-div"></div>
+            <div class="bg-div"></div>
+            <div class="bg-div"></div>
+            <div class="bg-div"></div>
+            <div class="bg-div"></div>
+            <div class="bg-div"></div>
+            <div class="bg-div"></div>
+            <div class="bg-div"></div>
+            <div class="bg-div"></div>
+            <div class="bg-div"></div>
+            <div class="bg-div"></div>
+        </div>
+        <div id="mc1" class="mc"></div>
+        <div id="mc2" class="mc"></div>
+        <div id="mc3" class="mc"></div>
+        <div id="mc4" class="mc"></div>
+    </body>
+</html>
