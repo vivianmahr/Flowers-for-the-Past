@@ -197,67 +197,53 @@ function(goody, Vector, vars)
             }
             //.. If I understand right this only works if it started edgeless?
             newEF0 = BG0Images.map( function(x) { return x + ((increment-1) * vars.elementalTileOffsets[elementType]); } );
-            
+            // All the updating tile images should probably be a seperate function
 
             if (adjacentTilesDifferentElement["up"]) {
                 newEF0[0] -= vars.tileSetTileWidth;
                 newEF0[1] -= vars.tileSetTileWidth;
-            }
-            else if (!isNeighbor) {
-                this.updateZone(this.zoneIndexUp(zone), true)
             }
 
             if (adjacentTilesDifferentElement["right"]) { // right is different
                 newEF0[1] += 1;
                 newEF0[3] += 1;
             }
-            else if (!isNeighbor){
-                this.updateZone(this.zoneIndexRight(zone), true)
-            }
             if (adjacentTilesDifferentElement["down"]) { // down is different
                 newEF0[2] += vars.tileSetTileWidth;
                 newEF0[3] += vars.tileSetTileWidth;
-            }
-
-            else if (!isNeighbor){
-                this.updateZone(this.zoneIndexDown(zone), true)
             }
 
             if (adjacentTilesDifferentElement["left"]) { // left is different
                 newEF0[0] -= 1;
                 newEF0[2] -= 1;
             }
-            else if (!isNeighbor){
-                this.updateZone(this.zoneIndexLeft(zone), true);
-            }
-
+            // May have to be redone depending on how the spritesheet ends up organized
             if (!adjacentTilesDifferentElement["up"] && !adjacentTilesDifferentElement["right"] && adjacentTilesDifferentElement["upRight"]) { 
                 newEF0[1] = newEF0[1] + vars.tileSetTileWidth * 3 -1;
-            }
-            else if (!isNeighbor){
-                this.updateZone(this.zoneIndexUpRight(zone), true);
             }
 
             if (!adjacentTilesDifferentElement["down"] && !adjacentTilesDifferentElement["left"] && adjacentTilesDifferentElement["downLeft"]) { 
                 newEF0[2] = newEF0[2] + vars.tileSetTileWidth * 3 -1;
             }
-            else if (!isNeighbor){
-                this.updateZone(this.zoneIndexDownLeft(zone), true);
-            }
 
             if (!adjacentTilesDifferentElement["up"] && !adjacentTilesDifferentElement["left"] && adjacentTilesDifferentElement["upLeft"]) { 
                 newEF0[0] = newEF0[0] + vars.tileSetTileWidth * 3 -1;
-            }
-            else if (!isNeighbor){
-                this.updateZone(this.zoneIndexUpLeft(zone), true);
             }
 
             if (!adjacentTilesDifferentElement["down"] && !adjacentTilesDifferentElement["right"] && adjacentTilesDifferentElement["downRight"]) { 
                 newEF0[3] = newEF0[3] + vars.tileSetTileWidth * 3 -1;
             }
-            else if (!isNeighbor){
-                this.updateZone(this.zoneIndexDownRight(zone), true);
-            }
+        }
+        if (!isNeighbor) {
+
+            this.updateZone(this.zoneIndexLeft(zone), true);
+            this.updateZone(this.zoneIndexRight(zone), true)
+            this.updateZone(this.zoneIndexUp(zone), true)
+            this.updateZone(this.zoneIndexDown(zone), true)
+            this.updateZone(this.zoneIndexUpRight(zone), true);
+            this.updateZone(this.zoneIndexDownLeft(zone), true);
+            this.updateZone(this.zoneIndexUpLeft(zone), true);
+            this.updateZone(this.zoneIndexDownRight(zone), true);
         }
         for (var i = 0; i < 4; i++) {
             var tile = zone[tiles[i]];
