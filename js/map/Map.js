@@ -71,7 +71,7 @@ function(goody, Vector, vars)
     Map.prototype.indexDownRight = function(n) {return n + this.width + 1; };
     Map.prototype.indexDownLeft = function(n) {return n + this.width - 1; };
 
-    Map.prototype.zoneIndexUp = function(zone) { return this.findZonebyIndex(this.indexLeft(zone.upLeft)); };
+    Map.prototype.zoneIndexUp = function(zone) { return this.findZonebyIndex(this.indexUp(zone.upLeft)); };
     Map.prototype.zoneIndexDown = function(zone) { return this.findZonebyIndex(this.indexDown(zone.downRight)); };
     Map.prototype.zoneIndexRight = function(zone) { return this.findZonebyIndex(this.indexRight(zone.downRight)); };
     Map.prototype.zoneIndexLeft = function(zone) { return this.findZonebyIndex(this.indexLeft(zone.downLeft)); };
@@ -142,7 +142,7 @@ function(goody, Vector, vars)
     Map.prototype.applyElement = function(pixelVector, element) {
         var zone = this.findZonebyPixel(pixelVector);
         var elementType = element < 2 ? "Humidity" : element < 4 ? "Growth" : "Temperature";
-        var tiles = ["upRight", "upLeft", "downLeft", "downRight"];
+        var tiles = ["upLeft", "upRight", "downLeft", "downRight"];
         var increment = element % 2 ? 1 : -1; // Whether the category changes by + or - 1
         var cap = increment === 1 ? 2 : 0;
         // For early stages only, tiles should only have one element applied to them at a time
@@ -166,7 +166,7 @@ function(goody, Vector, vars)
         var newEF1 = [0, 0, 0, 0];
         var newEF2 = [0, 0, 0, 0];
         var BG0Images = [0, 0, 0, 0];
-        var tiles = ["upRight", "upLeft", "downLeft", "downRight"];
+        var tiles = ["upLeft", "upRight", "downLeft", "downRight"];
         for (var i = 0; i < 4; i++) {
             var tile = zone[tiles[i]];
             newEF0[i] = this.effectMap[0][tile];
@@ -196,10 +196,9 @@ function(goody, Vector, vars)
                 increment = tileElement[2];
             }
             //.. If I understand right this only works if it started edgeless?
-            console.log(newEF0);
             newEF0 = BG0Images.map( function(x) { return x + ((increment-1) * vars.elementalTileOffsets[elementType]); } );
-            console.log(newEF0);
-        
+            
+
             if (adjacentTilesDifferentElement["up"]) {
                 newEF0[0] -= vars.tileSetTileWidth;
                 newEF0[1] -= vars.tileSetTileWidth;
@@ -208,7 +207,6 @@ function(goody, Vector, vars)
                 this.updateZone(this.zoneIndexUp(zone), true)
             }
 
-
             if (adjacentTilesDifferentElement["right"]) { // right is different
                 newEF0[1] += 1;
                 newEF0[3] += 1;
@@ -216,15 +214,14 @@ function(goody, Vector, vars)
             else if (!isNeighbor){
                 this.updateZone(this.zoneIndexRight(zone), true)
             }
-
             if (adjacentTilesDifferentElement["down"]) { // down is different
                 newEF0[2] += vars.tileSetTileWidth;
                 newEF0[3] += vars.tileSetTileWidth;
             }
+
             else if (!isNeighbor){
                 this.updateZone(this.zoneIndexDown(zone), true)
             }
-
 
             if (adjacentTilesDifferentElement["left"]) { // left is different
                 newEF0[0] -= 1;
@@ -233,25 +230,35 @@ function(goody, Vector, vars)
             else if (!isNeighbor){
                 this.updateZone(this.zoneIndexLeft(zone), true);
             }
-/*
-            // upright
-            if (!adjacentTilesDifferentElement[0] && !adjacentTilesDifferentElement[2] && adjacentTilesDifferentElement[1]) {
+
+            if (!adjacentTilesDifferentElement["up"] && !adjacentTilesDifferentElement["right"] && adjacentTilesDifferentElement["upRight"]) { 
                 newEF0[1] = newEF0[1] + vars.tileSetTileWidth * 3 -1;
             }
-            else {
-                this.updateNeighboringTile(this.findZonebyIndex(this.indexRight(this.indexUp(zone[1]))));
+            else if (!isNeighbor){
+                this.updateZone(this.zoneIndexUpRight(zone), true);
             }
 
-            // downleft
-            if (!adjacentTilesDifferentElement[4] && !adjacentTilesDifferentElement[6] && adjacentTilesDifferentElement[5]) {
+            if (!adjacentTilesDifferentElement["down"] && !adjacentTilesDifferentElement["left"] && adjacentTilesDifferentElement["downLeft"]) { 
                 newEF0[2] = newEF0[2] + vars.tileSetTileWidth * 3 -1;
             }
-            else {
-                this.updateNeighboringTile(this.findZonebyIndex(this.indexLeft(this.indexDown(zone[2]))));
+            else if (!isNeighbor){
+                this.updateZone(this.zoneIndexDownLeft(zone), true);
             }
-            */
+
+            if (!adjacentTilesDifferentElement["up"] && !adjacentTilesDifferentElement["left"] && adjacentTilesDifferentElement["upLeft"]) { 
+                newEF0[0] = newEF0[0] + vars.tileSetTileWidth * 3 -1;
+            }
+            else if (!isNeighbor){
+                this.updateZone(this.zoneIndexUpLeft(zone), true);
+            }
+
+            if (!adjacentTilesDifferentElement["down"] && !adjacentTilesDifferentElement["right"] && adjacentTilesDifferentElement["downRight"]) { 
+                newEF0[3] = newEF0[3] + vars.tileSetTileWidth * 3 -1;
+            }
+            else if (!isNeighbor){
+                this.updateZone(this.zoneIndexDownRight(zone), true);
+            }
         }
-        console.log(newEF0);
         for (var i = 0; i < 4; i++) {
             var tile = zone[tiles[i]];
             this.effectMap[0][tile] = newEF0[i];
@@ -262,16 +269,17 @@ function(goody, Vector, vars)
 
 
     Map.prototype.compareAdjacentTiles = function(tileElement, zone) {
-        return {
-            "up" : !goody.arrayEquals(this.getTileElement(this.zoneIndexUp(zone)), tileElement), 
-            "upRight": !goody.arrayEquals(this.getTileElement(this.zoneIndexUpRight(zone)), tileElement), 
-            "right" : !goody.arrayEquals(this.getTileElement(this.zoneIndexRight(zone)), tileElement), 
-            "downRight" : !goody.arrayEquals(this.getTileElement(this.zoneIndexDownRight(zone)), tileElement), 
-            "down" : !goody.arrayEquals(this.getTileElement(this.zoneIndexDown(zone)), tileElement), 
-            "downLeft" : !goody.arrayEquals(this.getTileElement(this.zoneIndexDownLeft(zone)), tileElement), 
-            "left" : !goody.arrayEquals(this.getTileElement(this.zoneIndexLeft(zone)), tileElement), 
-            "upLeft" : !goody.arrayEquals(this.getTileElement(this.zoneIndexUpLeft(zone)), tileElement),    
+        var result =  {
+            "up" : !goody.arrayEquals(this.getZoneElement(this.zoneIndexUp(zone)), tileElement), 
+            "upRight": !goody.arrayEquals(this.getZoneElement(this.zoneIndexUpRight(zone)), tileElement), 
+            "right" : !goody.arrayEquals(this.getZoneElement(this.zoneIndexRight(zone)), tileElement), 
+            "downRight" : !goody.arrayEquals(this.getZoneElement(this.zoneIndexDownRight(zone)), tileElement), 
+            "down" : !goody.arrayEquals(this.getZoneElement(this.zoneIndexDown(zone)), tileElement), 
+            "downLeft" : !goody.arrayEquals(this.getZoneElement(this.zoneIndexDownLeft(zone)), tileElement), 
+            "left" : !goody.arrayEquals(this.getZoneElement(this.zoneIndexLeft(zone)), tileElement), 
+            "upLeft" : !goody.arrayEquals(this.getZoneElement(this.zoneIndexUpLeft(zone)), tileElement),    
         }
+        return result;
     }
 
 
@@ -282,6 +290,7 @@ function(goody, Vector, vars)
     Map.prototype.getHeight = function(tileIndex) {
         return this.heightMap[tileIndex];
     }
+
     Map.prototype.getTileElement = function(tileIndex) {
         var result  = [];
         result.push(this.elementMap["Growth"][tileIndex]);
