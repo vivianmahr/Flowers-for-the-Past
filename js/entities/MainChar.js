@@ -135,6 +135,8 @@ function(Animation, Entity, Vector, goody, vars)
                 var fly = this.movementAttributes.airborne;
                 // Do nothing if you're walking on flat ground or a slight incline
                 // Do nothing if you're not airborne or the height difference is nothing doable
+				
+				console.log("sink:" + sink, "fly :" + fly, map.getHeight(newTile), this.movementAttributes.height, heightDifference);
                 if ((map.isJump(newTile) || (Math.abs(heightDifference) > 1)) && heightDifference <= 2) {
                     if (sink && heightDifference > -3 && heightDifference <= 0 ) {
                         this.applyHumChange(map, newTile);

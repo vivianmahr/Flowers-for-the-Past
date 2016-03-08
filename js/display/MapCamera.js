@@ -27,15 +27,15 @@ function(Vector, goody, vars)
                 var ctx = this._buffer[i].getContext("2d");
                 var image = images["intro_P" + i];
                 ctx.drawImage(
-                    image,                                                      //image
+                    image,                                                   //image
                     0,                                                       //x position on image
                     0,                                                       //y position on image
-                    image.width,                                                        //imageWidth on Source
-                    image.height,                                                        //imageHeight on Source
-                    0,                                                //xPosCanvas    
-                    0,                                                 //yPosCanvas    
-                    image.width,                                                        //imageWidth on Canvas
-                    image.height                                                         //imageHeight on Canvas                
+                    image.width,                                             //imageWidth on Source
+                    image.height,                                            //imageHeight on Source
+                    0,                                                       //xPosCanvas    
+                    0,                                                       //yPosCanvas    
+                    image.width,                                             //imageWidth on Canvas
+                    image.height                                              //imageHeight on Canvas                
                 );
             }
         }
@@ -83,9 +83,9 @@ function(Vector, goody, vars)
         this._offset.y = Math.floor(goody.cap(cheight /2 - MCpos.y, -this._mapPixelHeight + cheight, 0));
     };
 
-    MapCamera.prototype.showString = function(string) {
+    MapCamera.prototype.showString = function(string, y) {
         // Displays a string on the upper left corner of the canvas
-        this._ctx.fillText(string, 10, 20);
+        this._ctx.fillText(string, 10, y);
     }
 
     MapCamera.prototype.display = function(MC, cursor, objects) {
@@ -106,7 +106,9 @@ function(Vector, goody, vars)
         cursor.display(this._ctx);
         // Display debugging information - whatever is necessary at the moment 
         var scrap = MC.movementAttributes;
-        //this.showString(scrap.height);
+        // this.showString(scrap.height, 20);
+		//console.log( MC.movementAttributes);
+        //this.showString(scrap.height, 60);
         // this.showString("t= " + scrap.temperature + "height=" + scrap.height + " air=" + scrap.airborne + " sink=" + scrap.sinking);
     }
 
