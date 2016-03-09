@@ -4,21 +4,21 @@ function(Vector, goody, Scene, Map, MapCursor, MainChar, CollisionHandler, MapCa
     MapScene.prototype = new Scene.Scene();
     MapScene.prototype.constructor = MapScene;
 
-    function MapScene(ctx, json, currentElement, MCx, MCy, MCz, spawn) {
+    function MapScene(ctx, json, currentElement) {
         this.map = new Map.Map(json);
 		console.log(this.map);
         this.cursor = new MapCursor.MapCursor(currentElement);
         this.element = currentElement;
-        this.MC = new MainChar.MainChar(MCx, MCy, MCz);
-        if (spawn ===  true) {
-            var eventList = this.map.eventMap;
-            for (var i = 0; i < eventList.length; i++) {
-                if (eventList[i].type === "spawn") {
-                    this.MC.setPosition(eventList[i].x, eventList[i].y);
-                    this.MC.movementAttributes.height = eventList[i].properties.height;
-                }
-            }
-        }
+        this.MC = new MainChar.MainChar();
+		
+		var objects = this.map.objects;
+		for (var i = 0; i < objects.length; i++) {
+			if (objects[i].name === "MC_spawn") {
+			console.log(objects[i]);
+				this.MC.setPosition(objects[i].x, objects[i].y);
+				this.MC.movementAttributes.height = objects[i].properties.MC_height;
+			}
+		}
         this.loadEntities();
         this.collisionHandler = new CollisionHandler.CollisionHandler();
         this.camera = new MapCamera.MapCamera(ctx);

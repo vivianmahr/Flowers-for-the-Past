@@ -778,7 +778,7 @@ debug_5 = { "height":36,
                  "name":"MC_spawn",
                  "properties":
                     {
-                     "MC_height":"0"
+                     "MC_height":"1"
                     },
                  "rotation":0,
                  "type":"",
