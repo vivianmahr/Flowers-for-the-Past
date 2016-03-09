@@ -6,6 +6,7 @@ function(Vector, goody, Scene, Map, MapCursor, MainChar, CollisionHandler, MapCa
 
     function MapScene(ctx, json, currentElement, MCx, MCy, MCz, spawn) {
         this.map = new Map.Map(json);
+		console.log(this.map);
         this.cursor = new MapCursor.MapCursor(currentElement);
         this.element = currentElement;
         this.MC = new MainChar.MainChar(MCx, MCy, MCz);

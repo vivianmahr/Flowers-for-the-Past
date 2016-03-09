@@ -1391,7 +1391,7 @@ test_intro_0 = { "height":36,
  "version":1,
  "width":40
 }
-
+}
 return {
 	debug_0 : debug_0,
 	debug_1 : debug_1,
